@@ -1,6 +1,8 @@
 import requests
 import json
 import re
+import datetime
+from parsers import Parser, Category
 
 def ParseDeal(url, parserloc):
 	try:
@@ -20,4 +22,18 @@ def ParseDeal(url, parserloc):
 		else:
 			print("Can't parse %s" % key)
 	print(result)
+
+def LoadCSV(csvfile):
+	with open(csvfile, 'r') as f:
+		reader = csv.reader(f)
+		next(reader, None)
+		for row in reader:
+			deal = models.Deal(title = row[0], \
+							   website=row[1], \
+							   price=float(row[2]), \
+							   date=datetime.datetime.strptime(row[3], "%m/%d/%y %I:%M %p"), \
+							   parser=Parser.objects.all()[0], \
+							   category=Category.objects.all()[0])
+			deal.save()
+
 

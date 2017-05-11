@@ -11,14 +11,13 @@ def index(request):
 	return render(request, 'index.html')
 
 def profile(request):
-	return render(request, 'profile.html')
+	user = request.user#User.objects.get(username=username)
+	return render(request, 'user_profile.html', \
+		{"user":user})
 
 def logout_user(request):
 	logout(request)
 	return render(request, 'log_out.html')
-
-# def search_form(request):
-#     return render(request, 'search_form.html')
 
 def search(request):
 	error = False
@@ -32,6 +31,9 @@ def search(request):
 					  {'books': books, 'query':q})
 	return render(request, 'search_form.html', \
 					 {'error':error})
+
+def dealtrend(request):
+	return None
 
 def contact(request):
 	if request.method == 'POST':

@@ -21,6 +21,7 @@ from djangoSite import views
 urlpatterns = [
     url('^', include('django.contrib.auth.urls'), name='login'),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^profile/', views.profile, name='profile'),
     url(r'^logged_out/$', views.logout_user, name='loggedout'),
     url(r'^$', views.index, name='homepage'),
     url(r'^search/$', views.search),

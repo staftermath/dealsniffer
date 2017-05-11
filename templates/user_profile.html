@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}
+User Profile
+{% endblock %}
+{% block content %}
+{% if user.is_authenticated %}
+<table>
+<tr>
+	<td>Username:</td>
+	<td>{{ user.username }}</td>
+</tr>
+<tr>
+	<td>E-mail:</td>
+	<td>{{ user.email }}</td>
+</tr>
+<tr>
+	<td>First Name:</td>
+	<td>{{ user.first_name }}</td>
+</tr>
+<tr>
+	<td>Last Name:</td>
+	<td>{{ user.last_name }}</td>
+</tr>
+</table>
+{% else %}
+<h1>You need to log in to view your profile</h1>
+{% endif %}
+{% endblock %}
