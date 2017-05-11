@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+
+<html lang="en">
+
+<head>
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    <h1>Project Deal Sniffer</h1>
+    <a href="{% url 'homepage' %}">Home</a> |
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'loggedout' %}">Logout</a>
+    {% else %}
+    <a href="{% url 'login' %}?next={% url 'homepage' %}">Login</a>
+    {% endif %} | 
+    <a href="{% url 'contact' %}">Contact Us</a> | 
+    <a href="https://github.com/staftermath/dealsniffer">GitHub</a>
+    <hr>
+    {% block content %}{% endblock %}
+
+    {% block footer %}
+    <hr>
+    <p>Thanks for visiting my site.</p>
+    {% endblock %}
+</body>
+</html>

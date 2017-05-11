@@ -1,0 +1,2 @@
+{"inStockParser": "\"availability\".*\"InStock\">(In Stock)",
+"priceParser": "<meta itemprop=\"price\" content=\"([0-9.]*)\""}

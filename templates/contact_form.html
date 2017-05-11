@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Contact us</title>
+</head>
+<body>
+	<h1>Contact us</h1>
+
+	{% if form.errors %}
+		<p style="color: red;">
+		Please correct the error{{ form.errors|pluralize }} below.</p>
+	{% endif %}
+	<form action="" method="post">
+	<table>
+		<tr>
+		<div class="field">
+			{{ form.subejct.errors }}		
+			<td><label for="id_subject">Subject:</label></td>
+			<td>{{ form.subject}}</td>
+		</div>
+		</tr>
+		<tr>
+		<div class="field">
+			{{ form.email.erros }}
+			<td><label for="id_email">Your e-mail address:</label></td>
+			<td>{{ form.email }}</td>
+		</div>
+		</tr>
+		<tr>
+		<div class="field">
+			{{ form.message.errors}}
+			<td><label for="id_message">Message:</label></td>
+			<td>{{ form.message }}</td>
+		</div>
+		</tr>
+		{% csrf_token %}
+		<tr>
+		<td><input type="submit" name="Submit"></td>
+		</tr>
+	</table>
+	</form>
+</body>
+</html>
