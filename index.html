@@ -1,0 +1,24 @@
+<!-- To render the html, go to http://htmlpreview.github.io/ and follow the guide -->
+
+<!DOCTYPE html>
+<html>
+<div id="chartContainer">
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="http://dimplejs.org/dist/dimple.v2.3.0.min.js"></script>
+	<script type="text/javascript">
+    var svg = dimple.newSvg("#chartContainer", 590, 400);
+    d3.csv("data/price_history.csv", function (data) {
+      var myChart = new dimple.chart(svg, data);
+      myChart.setBounds(60, 30, 505, 305);
+      var x = myChart.addCategoryAxis("x", "Date");
+      x.addOrderRule("Date");
+      var y = myChart.addMeasureAxis("y", "Price");
+      y.overrideMin = 150;	
+	  y.overrideMax = 250;
+      var s = myChart.addSeries(null, dimple.plot.line);
+      myChart.draw();
+    });
+  </script>
+</div>
+</html>
+
