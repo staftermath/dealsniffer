@@ -4,7 +4,11 @@
 <h2>{% if request.user.is_authenticated %}
 {{ request.user.username }}:
 {% endif %}Welcome to the Home Page</h2>
+<<<<<<< HEAD
 <hr>
 <h2>Selected Deal Trend</h2>
 {% include "deal_trend.html" %}
+=======
+{% include "deal_trend.html"%}
+>>>>>>> d06282aba4700d77ab98facfb0e8532d0aed0d02
 {% endblock %}
