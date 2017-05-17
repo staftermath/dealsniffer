@@ -25,7 +25,7 @@ class Deal(models.Model):
 	category = models.ForeignKey(Category)
 	website = models.URLField()
 	price = models.CharField(max_length=100)
-	date = models.DateField()
+	date = models.DateTimeField()
 	parser = models.ForeignKey(Parser)
 	
 	def __str__(self):

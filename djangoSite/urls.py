@@ -27,5 +27,9 @@ urlpatterns = [
     url(r'^search/$', views.search),
     url(r'^contact/$', views.contact, name='contact'),
     url(r'^publisher/$', views.PublisherList.as_view()),
+    url(r'^chart/$', views.dealtrend, name='dealtrend'),
+    # url(r'^trend/$', views.dealtrend, name='dealtrend'),
+    url(r'^api/dealtrend/$', views.generate_deal_data, name='dealtrend'),
     url(r'^books/([\w-]+)/$', views.PublisherBookList.as_view()),
+
 ]

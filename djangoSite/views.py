@@ -1,14 +1,53 @@
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.core.mail import send_mail
+from django.http import JsonResponse
 from django.views.generic import ListView, DetailView
 from django.contrib.auth import authenticate, login, logout
-from .forms import ContactForm
+from django.core.serializers import serialize
+from django.core.serializers.json import DjangoJSONEncoder
+from django import forms
+from .forms import ContactForm, SelectDeal
 import datetime
+import pytz
+import json
+import calendar
 from books.models import Book, Publisher
+from parsers.models import Deal
+
 
 def index(request):
 	return render(request, 'index.html')
+
+# def chart(request):
+# 	dealName = list(Deal.objects.values_list('title', flat=True).distinct())
+# 	selectDeal = SelectDeal(dealName)
+# 	rawData = list(Deal.objects.values_list('date', 'price'))
+# 	# rawData = [(x1, x2) for (x1, x2) in rawData]
+# 	convertedData = {'date':[(x[0]-datetime.datetime(1970,1,1,tzinfo=pytz.UTC)).total_seconds()*1000 \
+# 						for x in rawData],
+# 					'price':[float(x[1]) for x in rawData]}
+# 	# convertedData = serialize('json', Deal.objects.all(), \
+# 	# 								cls=DjangoJSONEncoder, \
+# 	# 								fields=('date', 'price'))
+# 	chartcontainer = 'linechart_container'
+# 	data = {
+# 	'charttype': 'lineChart',
+# 	'chartdata': {'x':convertedData['date'],
+# 				  'y':convertedData['price'],
+# 				  'name': 'Deal Price'},
+# 	'chartcontainer': chartcontainer,
+# 	'extra': {
+# 		'x_is_date': True,
+# 		'x_axis_format': '%m/%d %H:%M:%S',
+# 		'tag_script_js': True,
+# 		'jquery_on_ready': False,
+# 		'y_axis_format': ".2f",
+# 		'y_axis_scale_min': 0,
+# 	}
+# 	}
+
+# 	return render(request, 'chart.html', data, selectDeal)	
 
 def profile(request):
 	user = request.user#User.objects.get(username=username)
@@ -33,7 +72,15 @@ def search(request):
 					 {'error':error})
 
 def dealtrend(request):
-	return None
+	dealName = list(Deal.objects.values_list('title', flat=True).distinct())
+	selectDeal = SelectDeal(dealName)
+	return render(request, 'chart.html', \
+		{"selectDeal":selectDeal})
+
+def generate_deal_data(request):
+	rawData = list(Deal.objects.values('date', 'price'))
+	# print(rawData)
+	return JsonResponse(rawData, safe=False)
 
 def contact(request):
 	if request.method == 'POST':
@@ -51,6 +98,10 @@ def contact(request):
 		form = ContactForm(initial={'subject':'I love your site!'})
 	return render(request, 'contact_form.html', \
 			{'form': form})
+
+def PassDjangoData(request):
+    data = Deal.objects.all()
+    return JsonResponse(list(data), safe=False)
 
 class PublisherList(ListView):
 	model = Publisher

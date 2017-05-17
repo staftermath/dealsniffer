@@ -2,7 +2,7 @@ import requests
 import json
 import re
 import datetime
-from parsers import Parser, Category
+from parsers.models import Parser, Category, Deal
 
 def ParseDeal(url, parserloc):
 	try:
@@ -35,5 +35,4 @@ def LoadCSV(csvfile):
 							   parser=Parser.objects.all()[0], \
 							   category=Category.objects.all()[0])
 			deal.save()
-
 

@@ -4,15 +4,22 @@
 	<script src="{% static 'js/d3.v4.min.js' %}"></script>
 	<script src="{% static 'js/dimple.v2.3.0.min.js' %}"></script>
 	<script type="text/javascript">
-    var svg = dimple.newSvg("#chartContainer", 590, 400);
-    d3.csv("{% static 'data/price_history.csv' %}", function (data) {
+    var svg = dimple.newSvg("#chartContainer", 600, 500);
+    var parseDate = d3.utcParse("%Y-%m-%dT%H:%M:%SZ");
+    var axixDate = d3.timeFormat("%H:%M:%S %m/%d")
+    d3.json("{% url 'dealtrend' %}", function (data) {
+    	data.forEach(function(d) {
+    		d.date = axixDate(parseDate(d.date))
+    		d.price = parseFloat(d.price)
+    	})
+      
       var myChart = new dimple.chart(svg, data);
-      myChart.setBounds(60, 30, 505, 305);
-      var x = myChart.addCategoryAxis("x", "Date");
+      myChart.setBounds(60, 30, 600, 300);
+      var x = myChart.addCategoryAxis("x", "date");
       x.addOrderRule("Date");
-      var y = myChart.addMeasureAxis("y", "Price");
-      y.overrideMin = 150;	
-	  y.overrideMax = 250;
+      var y = myChart.addMeasureAxis("y", "price");
+   //    y.overrideMin = 150;	
+	  // y.overrideMax = 250;
       var s = myChart.addSeries(null, dimple.plot.line);
       myChart.draw();
     });

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'books',
     'parsers',
+    'django_nvd3',
 ]
 
 MIDDLEWARE = [

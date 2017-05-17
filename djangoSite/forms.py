@@ -13,3 +13,9 @@ class ContactForm(forms.Form):
     	if num_words < 4:
     		raise forms.ValidationError("Not enough words! Minimal 4")
     	return message
+
+class SelectDeal(forms.Form):
+    def __init__(self, dealName):
+        self.dealName = dealName
+        super(SelectDeal, self).__init__()
+        self.fields['dealMenu'] = forms.ChoiceField(zip(self.dealName,self.dealName))
