@@ -19,3 +19,13 @@ class SelectDeal(forms.Form):
         self.dealName = dealName
         super(SelectDeal, self).__init__()
         self.fields['dealMenu'] = forms.ChoiceField(zip(self.dealName,self.dealName))
+
+class SelectCategory(forms.Form):
+    def __init__(self, brand, mainclass, subclass):
+        self.brand = brand
+        self.mainclass = mainclass
+        self.subclass = subclass
+        super(SelectCategory, self).__init__()
+        self.fields['brand'] = forms.ChoiceField(zip(self.brand,self.brand))
+        self.fields['mainclass'] = forms.ChoiceField(zip(self.mainclass,self.mainclass))
+        self.fields['subclass'] = forms.ChoiceField(zip(self.subclass,self.subclass))

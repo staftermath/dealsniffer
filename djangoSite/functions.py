@@ -32,7 +32,7 @@ def LoadCSV(csvfile):
 							   website=row[1], \
 							   price=float(row[2]), \
 							   date=datetime.datetime.strptime(row[3], "%m/%d/%y %I:%M %p"), \
-							   parser=Parser.objects.all()[0], \
-							   category=Category.objects.all()[0])
+							   parser=models.Parser.objects.all()[0], \
+							   category=models.Category.objects.all()[0])
 			deal.save()
 

@@ -7,47 +7,22 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.serializers import serialize
 from django.core.serializers.json import DjangoJSONEncoder
 from django import forms
-from .forms import ContactForm, SelectDeal
+from .forms import ContactForm, SelectDeal, SelectCategory
 import datetime
 import pytz
 import json
 import calendar
 from books.models import Book, Publisher
-from parsers.models import Deal
+from parsers.models import Deal, Category
 
+def datetime_handler(x):
+    if isinstance(x, datetime.datetime):
+        return x.isoformat()
+    raise TypeError("Unknown type")
 
 def index(request):
 	return render(request, 'index.html')
 
-# def chart(request):
-# 	dealName = list(Deal.objects.values_list('title', flat=True).distinct())
-# 	selectDeal = SelectDeal(dealName)
-# 	rawData = list(Deal.objects.values_list('date', 'price'))
-# 	# rawData = [(x1, x2) for (x1, x2) in rawData]
-# 	convertedData = {'date':[(x[0]-datetime.datetime(1970,1,1,tzinfo=pytz.UTC)).total_seconds()*1000 \
-# 						for x in rawData],
-# 					'price':[float(x[1]) for x in rawData]}
-# 	# convertedData = serialize('json', Deal.objects.all(), \
-# 	# 								cls=DjangoJSONEncoder, \
-# 	# 								fields=('date', 'price'))
-# 	chartcontainer = 'linechart_container'
-# 	data = {
-# 	'charttype': 'lineChart',
-# 	'chartdata': {'x':convertedData['date'],
-# 				  'y':convertedData['price'],
-# 				  'name': 'Deal Price'},
-# 	'chartcontainer': chartcontainer,
-# 	'extra': {
-# 		'x_is_date': True,
-# 		'x_axis_format': '%m/%d %H:%M:%S',
-# 		'tag_script_js': True,
-# 		'jquery_on_ready': False,
-# 		'y_axis_format': ".2f",
-# 		'y_axis_scale_min': 0,
-# 	}
-# 	}
-
-# 	return render(request, 'chart.html', data, selectDeal)	
 
 def profile(request):
 	user = request.user#User.objects.get(username=username)
@@ -72,15 +47,32 @@ def search(request):
 					 {'error':error})
 
 def dealtrend(request):
-	dealName = list(Deal.objects.values_list('title', flat=True).distinct())
-	selectDeal = SelectDeal(dealName)
+	allCategories = Category.objects.all()
+	brandList = list(allCategories.values_list('brand', flat=True).distinct())
+	mainclassList = list(allCategories.values_list('mainclass', flat=True).distinct())
+	subclassList = list(allCategories.values_list('subclass', flat=True).distinct())
+	categorySelect = SelectCategory(brandList, mainclassList, subclassList)
+	if request.method == 'GET':
+		
+		brand = request.GET.get('brand')
+		mainclass = request.GET.get('mainclass')
+		subclass = request.GET.get('subclass')
+		categorySelected = Category.objects.get(brand=brand, mainclass=mainclass,\
+												subclass=subclass)
+		rawData = list(Deal.objects.values('date', 'price').filter(category=categorySelected))
+		rawData = json.dumps(rawData, default=datetime_handler).encode('utf8')
+		return render(request, 'chart.html', \
+		{"categorySelect":categorySelect, "data":rawData})
+	else:
+		rawData = list(Deal.objects.values('date', 'price'))
+		rawData = json.dumps(rawData, default=datetime_handler).encode('utf8')
 	return render(request, 'chart.html', \
-		{"selectDeal":selectDeal})
+		{"categorySelect":categorySelect, "data":rawData})
 
-def generate_deal_data(request):
-	rawData = list(Deal.objects.values('date', 'price'))
-	# print(rawData)
-	return JsonResponse(rawData, safe=False)
+def generate_deal_data(request, data=None):
+	if not data:
+		data = list(Deal.objects.values('date', 'price'))
+	return JsonResponse(data, safe=False)
 
 def contact(request):
 	if request.method == 'POST':
