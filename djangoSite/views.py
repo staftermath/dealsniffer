@@ -91,7 +91,8 @@ def plottrend(request):
 		rawData = list(Deal.objects.filter(title=title, category=category).values('date', 'price'))
 	else:
 		rawData = None
-	return render(request, 'deal_trend.html', {"data":json.dumps(rawData,default=datetime_handler).encode('utf8')})
+	return render(request, 'deal_trend.html', {"data":json.dumps(rawData,default=datetime_handler).encode('utf8'),\
+		"title":title})
 
 
 def generate_deal_data(request, item=None):
