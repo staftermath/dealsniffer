@@ -83,8 +83,6 @@ def plottrend(request):
 	mainclass = request.GET.get('mainclass', default="")
 	subclass = request.GET.get('subclass', default="")
 	title = request.GET.get('title', default="")
-	print(brand)
-	print(mainclass)
 	category = Category.objects.filter(brand=brand, mainclass=mainclass,subclass=subclass)
 	if (category.count() > 0):
 		category = category[0]
