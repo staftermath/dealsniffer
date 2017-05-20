@@ -1,21 +1,30 @@
-<!-- To render the html, go to http://htmlpreview.github.io/ and follow the guide -->
 {% load static %}
-<div id="chartContainer">
-	<script src="{% static 'js/d3.v4.min.js' %}"></script>
-	<script src="{% static 'js/dimple.v2.3.0.min.js' %}"></script>
-	<script type="text/javascript">
-    var svg = dimple.newSvg("#chartContainer", 590, 400);
-    d3.csv("{% static 'data/price_history.csv' %}", function (data) {
-      var myChart = new dimple.chart(svg, data);
-      myChart.setBounds(60, 30, 505, 305);
-      var x = myChart.addCategoryAxis("x", "Date");
-      x.addOrderRule("Date");
-      var y = myChart.addMeasureAxis("y", "Price");
-      y.overrideMin = 150;	
-	  y.overrideMax = 250;
-      var s = myChart.addSeries(null, dimple.plot.line);
-      myChart.draw();
-    });
-  </script>
-</div>
+<body style="height:600px; width=700px">
+<div id="loadedContainer" style="height: 600px; width=700px;">
+  <script src="{% static 'js/d3.v4.min.js' %}"></script>
+  <script src="{% static 'js/dimple.v2.3.0.min.js' %}"></script>
+  <script type="text/javascript">
 
+    var svg = dimple.newSvg("#loadedContainer", 700, 500);
+    var parseDate = d3.utcParse("%Y-%m-%dT%H:%M:%S%Z");
+    var axixDate = d3.timeFormat("%H:%M:%S %m/%d")
+    //console.log("{{data}}")
+    var parseddata = JSON.parse("{{data}}".replace(/&quot;/g,'"'))
+    console.log(parseddata)
+    for (var i = 0, len = parseddata.length; i < len; i++) {
+      parseddata[i].date = axixDate(parseDate(parseddata[i].date))
+    parseddata[i].price = parseFloat(parseddata[i].price)
+  }
+      
+  var myChart = new dimple.chart(svg, parseddata);
+  myChart.setBounds(60, 50, 600, 300);
+  var x = myChart.addCategoryAxis("x", "date");
+  x.addOrderRule("Date");
+  var y = myChart.addMeasureAxis("y", "price");
+  var s = myChart.addSeries(null, dimple.plot.line);
+  svg.append("text").attr("x", myChart._xPixels() + myChart._widthPixels() / 2).attr("y", myChart._yPixels() - 20).style("text-anchor", "middle").style("font-weight", "bold").text("{{ title }}")
+  myChart.draw();
+
+</script>
+</div>
+</body>
