@@ -43,7 +43,7 @@ function UpdateOneMenu(menu, menuList=MENULIST, object=parsedMenu, id_prefix="me
 		object = object[newMenuList[0]]
 	};
 };
-var selectMenuTemplate = '<select id="%ID%" name="%NAME%"></select>'
+var selectMenuTemplate = '<select id="%ID%" name="%NAME%" style="width: 100px"></select>'
 function UpdateAllMenu(menuList, object, formId, template, selected = selected){
 	console.log("selected passed to UpdateAllMenu function:")
 	console.log(selected)
