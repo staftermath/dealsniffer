@@ -2,57 +2,56 @@
 {% load static %}
 {% block title %}Deal Trend{% endblock %}
 {% block content %}
-<script src="{% static 'js/d3.v4.min.js' %}"></script>
-<script src="{% static 'js/dimple.v2.3.0.min.js' %}"></script>
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script type="text/javascript">
-console.log("{{menuDict}}".replace(/&quot;/g,'"'))
 var parsedMenu = JSON.parse("{{menuDict}}".replace(/&quot;/g,'"'));
 var MENULIST = ['brand', 'mainclass', 'subclass', 'title'];
+{% if selected %}
+	var selected = JSON.parse("{{selected}}".replace(/&quot;/g,'"'));
+	console.log("selected:");
+	console.log(selected);
+{% else %}
+	var selected = null;
+{% endif %}
 function UpdateOneMenu(menu, menuList=MENULIST, object=parsedMenu, id_prefix="menu_") {
 	// get List
 	index = menuList.indexOf(menu)
 	// find the menu
 	for (i = 0; i < index; i++) {
 		selectedValue = document.getElementById(id_prefix+menuList[i]).value
-		// console.log("Selected Value for Menu "+ menuList[i] +" is " + selectedValue)
+	// console.log("Selected Value for Menu "+ menuList[i] +" is " + selectedValue)
 		object = object[selectedValue]
 	};
 	// Update all select menu after this level
 	for (k = index; k < menuList.length; k++) {
 		thisMenu = menuList[k]
-		// get menu list. Array if it's the inner-most object. Otherwise Object and need to get keys
+	// get menu list. Array if it's the inner-most object. Otherwise Object and need to get keys
 		if (object.constructor === Object) {
 			newMenuList = Object.keys(object)
 		} else if (object.constructor === Array) {
 			newMenuList = object
 		}
-		// Append menulist
+	// Append menulist
 		tag = $("#"+id_prefix+thisMenu);
 		tag.html('')
 		if (newMenuList.length > 0){
 			for (j = 0; j < newMenuList.length; j++) {
 				tag.append($('<option>', {value:newMenuList[j], text:newMenuList[j]}));	
 			};
-			tag.value = newMenuList[0]
+			tag.val(newMenuList[0]);
 		}
 		object = object[newMenuList[0]]
 	};
 };
-var selectMenuTemplate = '<select id="%ID%" name="%NAME%" onchange="%ONCHANGE%"></select>'
-function UpdateAllMenu(menuList, object, formId, template){
-	onchangeTemplate = "UpdateOneMenu(menu ='%MENU%')"
+var selectMenuTemplate = '<select id="%ID%" name="%NAME%"></select>'
+function UpdateAllMenu(menuList, object, formId, template, selected = selected){
+	console.log("selected passed to UpdateAllMenu function:")
+	console.log(selected)
 	for (var i=0; i < menuList.length; i++){
 		menu = menuList[i]
-		if (i < menuList.length - 1) {
-			selectTemplate = template.replace("%ID%", "menu_"+menu).replace("%NAME%", menu).replace("%ONCHANGE%", onchangeTemplate.replace("%MENU%", menuList[i+1]));
-		} else {
-			selectTemplate = template.replace("%ID%", "menu_"+menu).replace("%NAME%", menu).replace("%ONCHANGE%","");
-		}
-		// console.log("Updating Menu")
-		// console.log(selectTemplate)
-		// document.getElementById(formId).append(selectTemplate)
+		selectTemplate = template.replace("%ID%", "menu_"+menu).replace("%NAME%", menu);
 		$("#"+formId ).append($.parseHTML(selectTemplate))
+		$("#"+formId ).append('|')
 		if (object.constructor === Object) {
 			newMenuList = Object.keys(object)
 			object = object[newMenuList[0]]
@@ -60,58 +59,57 @@ function UpdateAllMenu(menuList, object, formId, template){
 			newMenuList = object
 		}
 		tag = $("#"+"menu_"+menu)
+		console.log("Updating Menu:")
+		console.log(newMenuList)
 		for (j = 0; j < newMenuList.length; j++) {
 			tag.append($('<option>', {value:newMenuList[j], text:newMenuList[j]}));	
 		};
-		tag.value = newMenuList[0];
-
-	};
-};
-function InitializeMenu(object, menuList){
-	for (i=1;i < menuList.length;i++){
-		object = object[document.getElementById("menu_"+menuList[i-1]).value]
-		if (object.constructor === Object) {
-			newMenuList = Object.keys(object)
-		} else if (object.constructor === Array) {
-			newMenuList = object
+		if (selected == null) {
+			tag.val(newMenuList[0]).change();
+		} else {
+			console.log("Changing "+selected[menu])
+			tag.val(selected[menu]).change();
 		}
+	};
+	// default selection
+	// add on change
+	onchangeTemplate = "UpdateOneMenu(menu='%MENU%')"
+	for (var i=0; i < menuList.length-1; i++){
 		tag = $("#"+"menu_"+menuList[i])
-		for (i = 0; i < newMenuList.length; i++) {
-			tag.append($('<option>', {value:newMenuList[i], text:newMenuList[i]}));	
-		};
+		tag.attr("onchange", onchangeTemplate.replace("%MENU%", menuList[i+1]))
 	}
-}
+	
+	$("#"+formId ).append($.parseHTML('<button type="button" onclick="LoadChart()">Submit</button>'))
+};
+
+function LoadChart(menuList = MENULIST){
+	var returnMenuValue = {}
+	for (var i = 0; i < menuList.length; i++){
+		menu = menuList[i]
+		console.log(menu)
+		console.log($("#menu_"+menu).val())
+		returnMenuValue[menu] = $("#menu_"+menu).val()
+	}
+	var url = "{% url 'api_plottrend' %}?"+jQuery.param(returnMenuValue)
+	var template = '<object type="text/html" data="%URL%" style="height:100%; width:100%;"></object>';
+	console.log("Load URL:")
+	console.log(url)
+	document.getElementById("chartContainer").innerHTML = template.replace("%URL%", url)
+};
 </script>
-<div id="menu_form">
-</div>
+<form id="menu_form" method="get">
+</form>
 <script type="text/javascript">
-	console.log(document.getElementById("menu_form"))
-	UpdateAllMenu(menulist=MENULIST,object=parsedMenu,formId="menu_form",template=selectMenuTemplate)
-	// InitializeMenu(object=parsedMenu, menuList=MENULIST)
+	UpdateAllMenu(menulist=MENULIST,
+				  object=parsedMenu,
+				  formId="menu_form",
+				  template=selectMenuTemplate,
+				  selected=selected
+				  )
 </script>
+
 {% endblock %}
 {% block chart %}
-<div id="chartContainer">
-	<script type="text/javascript">
-
-    var svg = dimple.newSvg("#chartContainer", 700, 500);
-    var parseDate = d3.utcParse("%Y-%m-%dT%H:%M:%S%Z");
-    var axixDate = d3.timeFormat("%H:%M:%S %m/%d")
-    var parseddata = JSON.parse("{{data}}".replace(/&quot;/g,'"'))
-
-    for (var i = 0, len = parseddata.length; i < len; i++) {
-    	parseddata[i].date = axixDate(parseDate(parseddata[i].date))
-		parseddata[i].price = parseFloat(parseddata[i].price)
-	}
-      
-	var myChart = new dimple.chart(svg, parseddata);
-	myChart.setBounds(60, 30, 600, 300);
-	var x = myChart.addCategoryAxis("x", "date");
-	x.addOrderRule("Date");
-	var y = myChart.addMeasureAxis("y", "price");
-	var s = myChart.addSeries(null, dimple.plot.line);
-	myChart.draw();
-
-  </script>
+<div id="chartContainer" style="height:500px">
 </div>
 {% endblock %}

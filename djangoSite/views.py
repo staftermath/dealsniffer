@@ -65,53 +65,34 @@ def dealtrend(request):
 				allDealsSelected = Deal.objects.filter(category=categorySelected)
 				dealList = list(allDealsSelected.values_list('title', flat=True).distinct())
 				menuDict[brand][mainclass][subclass] = dealList
-	print(json.dumps(menuDict))
-	if 'item' in request.GET:
-		rawData = list(Deal.objects.filter(title="item").values('date', 'price'))
-		return render(request, 'chart.html', {"menuDict":json.dumps(menuDict), \
-			"data":json.dumps(rawData, default=datetime_handler).encode('utf8')})
+	# if 'title' in request.GET:
+	# 	title = request.GET.get('title', default="")
+	# 	brand = request.GET.get('brand', default="")
+	# 	mainclass = request.GET.get('mainclass', default="")
+	# 	subclass = request.GET.get('subclass', default="")
+	# 	selected = dict(zip(["brand","mainclass","subclass","title"],[brand, mainclass, subclass, title]))
+	# 	print(selected)
+	# 	rawData = list(Deal.objects.filter(title=title).values('date', 'price'))
+	# 	return render(request, 'chart.html', {"menuDict":json.dumps(menuDict), \
+	# 		"data":json.dumps(rawData, default=datetime_handler).encode('utf8'), \
+	# 		"selected":json.dumps(selected)})
 	return render(request, 'chart.html', {"menuDict":json.dumps(menuDict)})
 
-# def dealtrend(request):
-# 	allCategories = Category.objects.all()
-# 	brandList = list(allCategories.values_list('brand', flat=True).distinct())
-# 	mainclassList = list(allCategories.values_list('mainclass', flat=True).distinct())
-# 	subclassList = list(allCategories.values_list('subclass', flat=True).distinct())
-# 	categorySelect = SelectCategory(brandList, mainclassList, subclassList)
-# 	rawData = []
-# 	if 'brand' in request.GET:
-# 		brand = request.GET.get('brand')
-# 		mainclass = request.GET.get('mainclass')
-# 		subclass = request.GET.get('subclass')
-# 		categorySelect.fields['brand'].initial = brand
-# 		categorySelect.fields['mainclass'].initial = mainclass
-# 		categorySelect.fields['subclass'].initial = subclass
-# 		categorySelected = Category.objects.get(brand=brand, mainclass=mainclass,\
-# 													subclass=subclass)
-# 		allDealsSelected = Deal.objects.filter(category=categorySelected)
-# 		allItems = list(allDealsSelected.values_list('title', flat=True).distinct())
-# 		categorySelect.AddItem(allItems)
-# 		if 'item' in request.GET:
-# 			print(categorySelect.fields.keys())
-# 			item = request.GET.get('item')
-# 			print(item)
-# 			categorySelect.AddItem(allItems)
-# 			categorySelect.fields['item'].initial = item
-# 			rawData = list(allDealsSelected.filter(title=item).values('date', 'price'))
-# 			rawData = json.dumps(rawData, default=datetime_handler).encode('utf8')
-# 			return render(request, 'chart_backup.html', \
-# 					{"categorySelect":categorySelect, "data":rawData})
-# 		# else:
-# 		# 	item = None
-			
-			
-# 		# 	return render(request, 'chart.html', \
-# 		# 			{"categorySelect":categorySelect})
-# 	else:
-# 		rawData = list(Deal.objects.values('date', 'price'))
-# 		rawData = json.dumps(rawData, default=datetime_handler).encode('utf8')
-# 	return render(request, 'chart_backup.html', \
-# 		{"categorySelect":categorySelect, "data":rawData})
+def plottrend(request):
+	brand = request.GET.get('brand', default="")
+	mainclass = request.GET.get('mainclass', default="")
+	subclass = request.GET.get('subclass', default="")
+	title = request.GET.get('title', default="")
+	print(brand)
+	print(mainclass)
+	category = Category.objects.filter(brand=brand, mainclass=mainclass,subclass=subclass)
+	if (category.count() > 0):
+		category = category[0]
+		rawData = list(Deal.objects.filter(title=title, category=category).values('date', 'price'))
+	else:
+		rawData = None
+	return render(request, 'deal_trend.html', {"data":json.dumps(rawData,default=datetime_handler).encode('utf8')})
+
 
 def generate_deal_data(request, item=None):
 	if not item:
