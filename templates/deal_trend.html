@@ -10,7 +10,7 @@
     var axixDate = d3.timeFormat("%H:%M:%S %m/%d")
     //console.log("{{data}}")
     var parseddata = JSON.parse("{{data}}".replace(/&quot;/g,'"'))
-    console.log(parseddata)
+    // console.log(parseddata)
     for (var i = 0, len = parseddata.length; i < len; i++) {
       parseddata[i].date = axixDate(parseDate(parseddata[i].date))
     parseddata[i].price = parseFloat(parseddata[i].price)
