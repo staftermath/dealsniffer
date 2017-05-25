@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title%}Add and View Parsers{% endblock %}
+{% block content %}
+<div id="LeftPanel" style="width: 50%; height: 100%; float: left;">
+<form method="post">
+<table id="table_addparser">
+<tr><td colspan="2" align="center" class="class_tablehead">Add Parsers</td></tr>
+{% for form in addparser %}
+	<tr>
+	<td>{{form.name}}</td>
+	<td>{{form}}</td>
+	</tr>
+{% endfor %}
+<tr><td></td><td><button type="button" name="add_parser">Add Parser</button></td></tr>
+</table>
+</form>
+</div>
+{% load static %}
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script type="text/javascript">
+function GetDealForThisParser(parsermenuId) {
+	console.log("Getting parser: "+parsermenuId)
+	var url = "{% url 'api_deal_for_parser' %}" + "?parser=" + parsermenuId
+	console.log(url)
+	var deals = jQuery.when(jQuery.getJSON(url)).done(
+		function(json) {
+			$("#deal_menu").html("");
+			for (var i = 0; i< json.length; i++)
+			{
+				$("#deal_menu").append($('<option/>', { 
+			        value: json[i],
+			        text : json[i]
+				    }));
+					if (i==0) {
+						$("#deal_menu").children().last().attr("selected","selected");
+					}
+			}
+						});
+
+};
+
+</script>
+<div id="RightPanel" style="width: 50%; height: 100%; float: right;">
+<table id="table_viewparser">
+	<tr>
+	<td align="center" class="class_tablehead" colspan="2">View Parsers</td>
+	</tr>
+	<form method="get">
+	<tr>
+		<td align="left">Parser</td>
+    	<td style="width:60%">{{ parsermenu.parser }}</td>
+    	<td><button type="button" id="view_parser" onclick="GetDealForThisParser(parsermenuId=$('#id_parser').val())">View Parser</button></td> 
+    </tr>
+    <tr>
+    	<td align="left">deals</td>
+    	<td><select id="deal_menu" name="deal_menu" style="width:60%"></select></td>
+    	<td><input type="submit" name="test_parser" value="Test Parser"/></td>
+    }
+    </tr>
+    <tr>
+    	<td align="left" >Item</td>
+    	<td align="center" style="width:60%">{{lastResult.title}}</td>
+    </tr>
+    {% for mykey, myvalue in testresult.items %}
+    <tr>
+    	<td align="left">{{mykey}}</td>
+    	<td align="center" style="width:60%">{{myvalue}}</td>
+    </tr>
+    {% endfor %}
+    </form>
+<script type="text/javascript">
+{% if lastResult and lastResult.title %}
+	var lastParser = "{{ lastResult.parser }}";
+	var lastTitle = "{{ lastResult.title }}";
+	console.log("remembered last selected parser: "+lastParser);
+	console.log("remembered last selected item: "+lastTitle);
+	GetDealForThisParser(parsermenuId=lastParser);
+	var tag = $("#deal_menu");
+	console.log($('#deal_menu > option').length)
+	for (var i = 0; i < tag.length; i++){
+		console.log(document.getElementById("deal_menu").options[i])
+	}
+{% endif %}
+</script>
+</table>                         
+</div>
+{% endblock %}

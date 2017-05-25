@@ -24,11 +24,10 @@ urlpatterns = [
     url(r'^profile/', views.profile, name='profile'),
     url(r'^logged_out/$', views.logout_user, name='loggedout'),
     url(r'^$', views.index, name='homepage'),
-    url(r'^search/$', views.search),
     url(r'^contact/$', views.contact, name='contact'),
-    url(r'^publisher/$', views.PublisherList.as_view()),
     url(r'^chart/$', views.dealtrend, name='dealtrend'),
+    url(r'^parser/$', views.addparser, name='parser'),
     url(r'^api/plottrend/$', views.plottrend, name='api_plottrend'),
-    url(r'^books/([\w-]+)/$', views.PublisherBookList.as_view()),
-
+    url(r'^api/getdeal/$', views.generate_deal_data, name='api_getdeal'),
+    url(r'^api/getdealforthisparser/$', views.get_deal_for_parser, name='api_deal_for_parser'),
 ]

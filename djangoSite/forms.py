@@ -36,3 +36,20 @@ class SelectCategory(forms.Form):
     def AddItem(self, item):
         if item:
             self.fields['item'] = forms.ChoiceField(zip(item,item))
+
+class AddParser(forms.Form):
+    name = forms.CharField(max_length=100,min_length=1)
+    body = forms.CharField(widget=forms.Textarea(attrs={'cols': 30, 'rows': 10}))
+    url = forms.URLField()
+    filename = forms.CharField(max_length=100,min_length=1)
+
+class SelectParser(forms.Form):
+    def __init__(self, choices = None):
+        self.choices = choices
+        super(SelectParser, self).__init__()
+        if self.choices:
+            self.fields['parser'] = forms.ChoiceField(zip(self.choices,self.choices))
+
+    def AddItem(self, item):
+        if item:
+            self.fields['parser'] = forms.ChoiceField(zip(item,item))

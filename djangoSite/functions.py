@@ -21,7 +21,7 @@ def ParseDeal(url, parserloc):
 			result[key] = parsed[0]
 		else:
 			print("Can't parse %s" % key)
-	print(result)
+	return result
 
 def LoadCSV(csvfile):
 	with open(csvfile, 'r') as f:

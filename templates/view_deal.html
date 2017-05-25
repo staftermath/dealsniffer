@@ -1,0 +1,17 @@
+<tr>
+	   	<td align="left">Parsers</td>
+    	<td>
+        <select id="deal_menu" name="deal_menu" style="width:100%">
+        </select>
+        </td>
+    	<td><button type="button" name="get_deal" value="Get Deal"
+            onclick="GetDeal(deal=$('#deal_menu').val(), parser=$('#id_parser').val())">Get Deal</button></td>
+</tr>
+<script type="text/javascript">
+function GetDeal(deal, parser) {
+    var url = "{% url 'api_getdeal'%}" + "?deal="+deal + "&parser=" + parser;
+    console.log(url)
+    var template = '<object type="text/html" data="%URL%" style="height:100%; width:100%;"></object>';
+    document.getElementById("display_deal").innerHTML = template.replace("%URL%", url)
+}
+</script>

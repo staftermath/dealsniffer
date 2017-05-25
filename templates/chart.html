@@ -8,8 +8,6 @@ var parsedMenu = JSON.parse("{{menuDict}}".replace(/&quot;/g,'"'));
 var MENULIST = ['brand', 'mainclass', 'subclass', 'title'];
 {% if selected %}
 	var selected = JSON.parse("{{selected}}".replace(/&quot;/g,'"'));
-	// console.log("selected:");
-	// console.log(selected);
 {% else %}
 	var selected = null;
 {% endif %}
