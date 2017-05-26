@@ -4,6 +4,31 @@ import re
 import datetime
 from parsers.models import Parser, Category, Deal
 
+def ParserValidate(string):
+	returnMsg = []
+	try:
+		parser = json.loads(string)
+	except json.JSONDecodeError:
+	    returnMsg.append("Incorrect Json String")
+	    return returnMsg, False
+	keys = list(parser.keys())
+	returnItems = [x for x in keys if x != "default"]
+	if "default" not in keys:
+	    returnMsg.append("No default. Assigning empty string to all item defaults")
+	    parser["default"] = dict(zip(keys, [""]*len(keys)))
+	else:
+	    try:
+	        assert type(parser["default"]) is dict
+	    except AssertionError:
+	        returnMsg.append("default item in JSON is not a dict")
+	        return returnMsg, False
+	    for _, key in enumerate(parser):
+	        if key != "default":
+	            if key not in parser["default"]:
+	                returnMsg.append( "Item " + key + " does not have a default. Assigning empty string")
+	                parser["default"][key]=""
+	    return returnMsg, True
+
 def ParseDeal(url, parserloc):
 	try:
 		r = requests.get(url)
@@ -15,12 +40,14 @@ def ParseDeal(url, parserloc):
 		parserDict = json.load(file)
 	result = dict()
 	for _, key in enumerate(parserDict):
-		pattern = re.compile(parserDict[key])
-		parsed = pattern.findall(content)
-		if (len(parsed) > 0):
-			result[key] = parsed[0]
-		else:
-			print("Can't parse %s" % key)
+		if (key != "default"):
+			pattern = re.compile(parserDict[key])
+			parsed = pattern.findall(content)
+			if (len(parsed) > 0):
+				result[key] = parsed[0]
+			else:
+				print("Can't parse %s" % key)
+				result[key] = parserDict["default"][key]
 	return result
 
 def LoadCSV(csvfile):

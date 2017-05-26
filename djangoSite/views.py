@@ -12,9 +12,11 @@ import datetime
 import pytz
 import json
 import calendar
+import os
+from django.conf import settings
 from books.models import Book, Publisher
 from parsers.models import Deal, Category, Parser
-from .functions import ParseDeal
+from .functions import ParseDeal, ParserValidate
 # from settings import BASE_DIR
 def datetime_handler(x):
     if isinstance(x, datetime.datetime):
@@ -101,18 +103,29 @@ def PassDjangoData(request):
 
 def addparser(request):
 	form = AddParser()
-	if request.method == "POST":
-		name = request.POST['name']
-		parser = request.POST['body']
-		filename = request.POST['filename']
-		filepath = os.path.join(BASE_DIR, 'parsers','parserfiles',filename)
-		with open(filepath, 'wb') as file:
-			file.write(parser)
-		parserData = Parser(name=name, filepath=os.path.join('parsers','parserfiles',filename))
-		parserData.save()
 	allParsers = list(Parser.objects.values_list('name'))
 	allParsers = [x[0] for x in allParsers]
 	menu = SelectParser(choices=allParsers)
+	if request.method == "POST":
+		print("Invoked")
+		name = request.POST['name']
+		parser = request.POST['body']
+		filename = request.POST['filename']
+		filepath = os.path.join(settings.BASE_DIR, 'parsers','parserfiles',filename)
+		msgs, validParser = ParserValidate(parser)
+		print(msgs)
+		if validParser:
+			pass
+			# with open(filepath, 'wb') as file:
+			# 	file.write(parser)
+			# parserData = Parser(name=name, filepath=os.path.join('parsers','parserfiles',filename))
+			# parserData.save()
+		return render(request, 'view_parser.html', {"addparser":form, \
+														"parsermenu":menu, \
+														"allParsers":allParsers, \
+														"msgs":msgs, \
+														"validparser":validParser})
+	
 	if request.method == "GET" and request.GET.get('test_parser')=='Test Parser':
 		print(request.GET)
 		parsername = request.GET.get('parser')

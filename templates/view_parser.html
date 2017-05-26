@@ -11,9 +11,13 @@
 	<td>{{form}}</td>
 	</tr>
 {% endfor %}
-<tr><td></td><td><button type="button" name="add_parser">Add Parser</button></td></tr>
+<tr><td></td><td><button type="submit" name="add_parser">Add Parser</button></td></tr>
+{% csrf_token %} 
 </table>
 </form>
+{% for msg in msgs %}
+<div><span style="color: {% if validparser %} #0000FF {% else %} red {% endif %}"><strong>{{msg}}</strong></span></div>
+{% endfor %}
 </div>
 {% load static %}
 <script src="{% static 'js/jquery.min.js' %}"></script>
