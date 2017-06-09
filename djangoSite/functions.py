@@ -2,7 +2,7 @@ import requests
 import json
 import re
 import datetime
-from parsers.models import Parser, Category, Deal
+from parsers.models import Parser, Category, Deal, Price
 
 def ParserValidate(string):
 	returnMsg = []
@@ -55,13 +55,12 @@ def LoadCSV(csvfile):
 		reader = csv.reader(f)
 		next(reader, None)
 		for row in reader:
-			deal = models.Deal(title = row[0], \
-							   website=row[1], \
+			title = row[0]
+			dealObject = Deal.objects.filter(title=title).distinct()[0]
+			price = Price(deal = dealObject, \
 							   price=float(row[2]), \
-							   date=datetime.datetime.strptime(row[3], "%m/%d/%y %I:%M %p"), \
-							   parser=models.Parser.objects.all()[0], \
-							   category=models.Category.objects.all()[0])
-			deal.save()
+							   date=datetime.datetime.strptime(row[3], "%m/%d/%y %I:%M %p"))
+			price.save()
 
 def TrackingDeal(dealTitle):
 	deal = Deal.objects.filter(title=dealTitle).value("category", "website","parser").distinct()

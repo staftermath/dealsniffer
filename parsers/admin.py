@@ -4,3 +4,4 @@ from .models import *
 admin.site.register(Parser)
 admin.site.register(Category)
 admin.site.register(Deal)
+admin.site.register(Price)

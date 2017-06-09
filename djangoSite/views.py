@@ -15,7 +15,7 @@ import calendar
 import os
 from django.conf import settings
 from books.models import Book, Publisher
-from parsers.models import Deal, Category, Parser
+from parsers.models import Deal, Category, Parser, Price
 from .functions import ParseDeal, ParserValidate
 # from settings import BASE_DIR
 def datetime_handler(x):
@@ -64,7 +64,9 @@ def plottrend(request):
 	category = Category.objects.filter(brand=brand, mainclass=mainclass,subclass=subclass)
 	if (category.count() > 0):
 		category = category[0]
-		rawData = list(Deal.objects.filter(title=title, category=category).values('date', 'price'))
+		thisdeal = Deal.objects.filter(title=title, category=category).distinct()[0]
+		rawData = list(Price.objects.filter(deal=thisdeal).values('date', 'price'))
+		# rawData = list(Deal.objects.filter(title=title, category=category).values('date', 'price'))
 	else:
 		rawData = None
 	return render(request, 'deal_trend.html', {"data":json.dumps(rawData,default=datetime_handler).encode('utf8'),\
