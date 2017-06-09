@@ -1,21 +1,62 @@
 {% extends 'base.html' %}
 {% block title%}Add and View Parsers{% endblock %}
 {% block content %}
+<script type="text/javascript">
+	
+	function hideAllTabs(tabclass){
+		$('.'+tabclass).each(function(index, item){$(item).attr('style','display:none')});
+	}
+
+	function showTab(id, tabclass){
+		hideAllTabs(tabclass=tabclass);
+		var myElement = document.getElementById(id);
+		myElement.style.display = 'inherit';
+	}
+
+</script>
 <div id="LeftPanel" style="width: 50%; height: 100%; float: left;">
-<form method="post">
-<table id="table_addparser">
-<tr><td colspan="2" align="center" class="class_tablehead">Add Parsers</td></tr>
-{% for form in addparser %}
-	<tr>
-	<td>{{form.name}}</td>
-	<td>{{form}}</td>
-	</tr>
-{% endfor %}
-<tr><td></td><td><button type="button" name="add_parser">Add Parser</button></td></tr>
-</table>
-</form>
+	<div class="tab">
+	  <button class="tablinks" onclick="showTab('tab_parser','tabcontent')">Add Parser</button>
+	  <button class="tablinks" onclick="showTab('tab_deal','tabcontent')">Add Deal</button>
+	</div>
+
+	<div id="tab_parser" class="tabcontent">
+		<form method="post">
+		<table id="table_addparser">
+		<tr><td colspan="2" align="center" class="class_tablehead">Add Parsers</td></tr>
+		{% for form in addparser %}
+			<tr>
+			<td>{{form.name}}</td>
+			<td>{{form}}</td>
+			</tr>
+		{% endfor %}
+		<tr><td></td><td><button type="submit" name="add_parser">Submit</button></td></tr>
+		</table>
+		</form>
+		{% for msg in msgs %}
+		<div><span class="{% if validparser %}class_warning{% else %}class_fatal{% endif %}"><strong>{{msg}}</strong></span></div>
+		{% endfor %}
+	</div>
+	<div id="tab_deal" class="tabcontent" style="display:none">
+		<form method="post">
+		<table id="table_adddeal">
+		<tr><td colspan="2" align="center" class="class_tablehead">Add Deal</td></tr>
+		{% for form in adddeal %}
+			<tr>
+			<td>{{form.name}}</td>
+			<td>{{form}}</td>
+			</tr>
+		{% endfor %}
+		<tr><td></td><td><button type="submit" name="add_deal">Submit</button></td></tr>
+		</table>
+		</form>
+	{% csrf_token %} 
+	</div>
+
+
 </div>
 {% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script type="text/javascript">
 function GetDealForThisParser(parsermenuId) {
@@ -41,47 +82,17 @@ function GetDealForThisParser(parsermenuId) {
 
 </script>
 <div id="RightPanel" style="width: 50%; height: 100%; float: right;">
-<table id="table_viewparser">
-	<tr>
-	<td align="center" class="class_tablehead" colspan="2">View Parsers</td>
-	</tr>
-	<form method="get">
-	<tr>
-		<td align="left">Parser</td>
-    	<td style="width:60%">{{ parsermenu.parser }}</td>
-    	<td><button type="button" id="view_parser" onclick="GetDealForThisParser(parsermenuId=$('#id_parser').val())">View Parser</button></td> 
-    </tr>
-    <tr>
-    	<td align="left">deals</td>
-    	<td><select id="deal_menu" name="deal_menu" style="width:60%"></select></td>
-    	<td><input type="submit" name="test_parser" value="Test Parser"/></td>
-    }
-    </tr>
-    <tr>
-    	<td align="left" >Item</td>
-    	<td align="center" style="width:60%">{{lastResult.title}}</td>
-    </tr>
-    {% for mykey, myvalue in testresult.items %}
-    <tr>
-    	<td align="left">{{mykey}}</td>
-    	<td align="center" style="width:60%">{{myvalue}}</td>
-    </tr>
-    {% endfor %}
-    </form>
-<script type="text/javascript">
-{% if lastResult and lastResult.title %}
-	var lastParser = "{{ lastResult.parser }}";
-	var lastTitle = "{{ lastResult.title }}";
-	console.log("remembered last selected parser: "+lastParser);
-	console.log("remembered last selected item: "+lastTitle);
-	GetDealForThisParser(parsermenuId=lastParser);
-	var tag = $("#deal_menu");
-	console.log($('#deal_menu > option').length)
-	for (var i = 0; i < tag.length; i++){
-		console.log(document.getElementById("deal_menu").options[i])
-	}
-{% endif %}
-</script>
-</table>                         
+<table>
+<td colspan="3">View Parsers</td>
+</tr>
+<tr>
+	<td align="left">Parser</td>
+	<td style="width:50%">{{ parsermenu.parser }}</td>
+	<td style="width:20%"><button type="button" id="view_parser" onclick="GetDealForThisParser(parsermenuId=$('#id_parser').val())">View Parser</button></td> 
+	<td style="width:20%">{% if request.user.is_superuser %}<button type="button" id="del_parser" onclick="">Delete Parser</button>{% endif %}</td>
+</tr>
+{% include "view_deal.html" %}
+</table>
+<div id="display_deal" style="width:100%;"></div>
 </div>
 {% endblock %}

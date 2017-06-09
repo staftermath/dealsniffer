@@ -63,3 +63,27 @@ def LoadCSV(csvfile):
 							   category=models.Category.objects.all()[0])
 			deal.save()
 
+def TrackingDeal(dealTitle):
+	deal = Deal.objects.filter(title=dealTitle).value("category", "website","parser").distinct()
+	if len(deal) > 1:
+		print("multiple url found. selecting first one.")
+	deal = deal[0]
+	parserloc = Parser.objects.filter(id=deal['parser']).values("filepath")[0]["filepath"]
+	dealresult = ParseDeal(url=deal['website'], parserloc=parserloc)
+	if dealresult:
+		if dealresult.get('inStock', 'Out Of Stock') != 'Out Of Stock':
+			price = dealresult.get('Price')
+			try:
+				float(price)
+			except ValueError:
+				print("Price is not float. Returned: " + price)
+				return False
+			newdeal = Deal(title=dealTitle, category=deal['category'], \
+				website=deal['website'], price=price, \
+				date=datetime.datetime.now(), parser=deal['parser'])
+			newdeal.save()
+			return True
+	return False
+			
+
+

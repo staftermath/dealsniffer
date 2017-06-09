@@ -2,12 +2,12 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.core.mail import send_mail
 from django.http import JsonResponse
-from django.views.generic import ListView, DetailView
+# from django.views.generic import ListView, DetailView
 from django.contrib.auth import authenticate, login, logout
-from django.core.serializers import serialize
-from django.core.serializers.json import DjangoJSONEncoder
+# from django.core.serializers import serialize
+# from django.core.serializers.json import DjangoJSONEncoder
 from django import forms
-from .forms import ContactForm, SelectDeal, SelectCategory, AddParser, SelectParser
+from .forms import ContactForm, SelectDeal, SelectCategory, AddParser, SelectParser, AddDeal
 import datetime
 import pytz
 import json
@@ -102,30 +102,53 @@ def PassDjangoData(request):
     return JsonResponse(list(data), safe=False)
 
 def addparser(request):
-	form = AddParser()
+	parserform = AddParser()
+	dealform = AddDeal()
 	allParsers = list(Parser.objects.values_list('name'))
 	allParsers = [x[0] for x in allParsers]
 	menu = SelectParser(choices=allParsers)
+	dealform.addparser(allParsers)
+	print(dealform)
 	if request.method == "POST":
-		print("Invoked")
-		name = request.POST['name']
-		parser = request.POST['body']
-		filename = request.POST['filename']
-		filepath = os.path.join(settings.BASE_DIR, 'parsers','parserfiles',filename)
-		msgs, validParser = ParserValidate(parser)
-		print(msgs)
-		if validParser:
-			pass
-			# with open(filepath, 'wb') as file:
-			# 	file.write(parser)
-			# parserData = Parser(name=name, filepath=os.path.join('parsers','parserfiles',filename))
-			# parserData.save()
-		return render(request, 'view_parser.html', {"addparser":form, \
+		if request.POST.get('add_parser')=='add_parser':
+			name = request.POST['name']
+			parser = request.POST['body']
+			filename = request.POST['filename']
+			filepath = os.path.join(settings.BASE_DIR, 'parsers','parserfiles',filename)
+			print(filepath)
+			msgs, validParser = ParserValidate(parser)
+			if validParser:
+				with open(filepath, 'w') as file:
+					print(parser, file=file)
+				parserData = Parser(name=name, filepath=filepath)
+				try:
+					parserData.save()
+					msgs.append("New Parser Saved!")
+				except:
+					msgs.append("Could not save new parser")
+			return render(request, 'view_parser.html', {"addparser":parserform, \
+														"adddeal":dealform,\
 														"parsermenu":menu, \
 														"allParsers":allParsers, \
 														"msgs":msgs, \
 														"validparser":validParser})
-	
+		if request.POST.get('add_deal')=='add_deal':
+			title = request.POST['title']
+			website = request.POST['website']
+			parsername = request.POST['parser']
+			parserID = [x[0] for x in Parser.objects.filter(name=parsername).values('id')[0]]
+			newdeal = Deal(title=title, website=website, parser = parserID)
+			try:
+				newdeal.save()
+				msgs.append("New Deal Saved")
+			except:
+				msgs.append("Could not save new deal")
+			return render(request, 'view_parser.html', {"addparser":parserform, \
+														"adddeal":dealform,\
+														"parsermenu":menu, \
+														"allParsers":allParsers, \
+														"msgs":msgs})
+
 	if request.method == "GET" and request.GET.get('test_parser')=='Test Parser':
 		print(request.GET)
 		parsername = request.GET.get('parser')
@@ -136,12 +159,16 @@ def addparser(request):
 		testResult['inStock'] = testResult.get('testResult', "Out Of Stock")
 		lastResult = {"title":title, \
 					  "parser":parsername}
-		return render(request, 'view_parser.html', {"addparser":form, \
+		return render(request, 'view_parser.html', {"addparser":parserform, \
+													"adddeal":dealform,\
 													"parsermenu":menu, \
 													"lastResult":lastResult, \
 													"testresult": testResult, \
 													"allParsers":allParsers})
-	return render(request, 'view_parser.html', {"addparser":form, "parsermenu":menu, "allParsers":allParsers})
+	return render(request, 'view_parser.html', {"addparser":parserform, \
+												"adddeal":dealform,\
+												"parsermenu":menu, \
+												"allParsers":allParsers})
 
 
 

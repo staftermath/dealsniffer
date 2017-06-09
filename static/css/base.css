@@ -1,0 +1,53 @@
+@import url(https://fonts.googleapis.com/css?family=Nunito:300);
+body {
+    font-family: 'Nunito', sans-serif;
+    color: #66d9ef;
+    background-color: #424242;
+    height: 100%; 
+    width:100%;
+    /*box-shadow: 2px 2px 2px 2px #404040;*/
+    /*border-radius: 3px 3px 3px 3px;*/
+}
+.navi > a {
+/*    border: 1px solid #0077B0;
+    padding: 5px;
+    border-radius: 4px 4px 0 0;*/
+    cursor: pointer;
+    width: 100px;
+    display: inline-block;
+    background-color: #353535;
+    color: #66d9ef;
+    text-align: center;
+    transition: .25s ease;
+    border: 1px solid #0077B0;
+    padding: 5px;
+    border-radius: 4px 4px 0 0;
+    text-decoration: none;
+}
+#page-wrapper {
+	/*background-color: #424242;*/
+}
+
+#footer {
+    position:fixed;
+    width: 100%;
+    bottom:0;
+    left:0;
+}
+
+input, select { 
+    padding: 3px; 
+    border: solid 1px #0077B0; 
+    outline: 0; 
+    /*background: -webkit-gradient(linear, left top, left 25, from(#FFFFFF), color-stop(4%, #57f4a0), to(#FFFFFF)); 
+    background: -moz-linear-gradient(top, #FFFFFF, #57f4a0 1px, #FFFFFF 2px); */
+    background: #edfffc;
+    box-shadow: rgba(0,0,0, 0.1) 0px 0px 2px; 
+    -moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 2px; 
+    -webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 2px; 
+}
+
+textarea {
+	border: solid 1px #0077B0; 
+	background: #edfffc;
+}

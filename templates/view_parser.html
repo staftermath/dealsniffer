@@ -1,23 +1,62 @@
 {% extends 'base.html' %}
 {% block title%}Add and View Parsers{% endblock %}
 {% block content %}
-<div id="LeftPanel" style="width: 50%; height: 100%; float: left;">
-<form method="post">
-<table id="table_addparser">
-<tr><td colspan="2" align="center" class="class_tablehead">Add Parsers</td></tr>
-{% for form in addparser %}
-	<tr>
-	<td>{{form.name}}</td>
-	<td>{{form}}</td>
-	</tr>
-{% endfor %}
-<tr><td></td><td><button type="submit" name="add_parser">Add Parser</button></td></tr>
-{% csrf_token %} 
-</table>
-</form>
-{% for msg in msgs %}
-<div><span style="color: {% if validparser %} #0000FF {% else %} red {% endif %}"><strong>{{msg}}</strong></span></div>
-{% endfor %}
+{% load static %}
+{# <link rel="stylesheet" type="text/css" href="{% static 'css/tab.css' %}"+ /> #}
+<link rel="stylesheet" type="text/css" href="{% static 'css/deal_table.css' %}" />
+<script type="text/javascript">
+	
+	function hideAllTabs(tabclass){
+		$('.'+tabclass).each(function(index, item){$(item).attr('style','display:none')});
+	}
+
+	function showTab(id, tabclass){
+		hideAllTabs(tabclass=tabclass);
+		var myElement = document.getElementById(id);
+		myElement.style.display = 'inherit';
+	}
+
+</script>
+<div id="LeftPanel" style="width: 50%; height: 100%; float: left;" class="Panel">
+	<div class="tab">
+	  <button class="tablinks" onclick="showTab('tab_parser','tabcontent_left')">Add Parser</button>
+	  <button class="tablinks" onclick="showTab('tab_deal','tabcontent_left')">Add Deal</button>
+	</div>
+
+	<div id="tab_parser" class="tabcontent_left div_menu">
+		<form method="post">
+		<table id="table_addparser">
+		<tr><td colspan="2" align="center" class="class_tablehead">Add Parsers</td></tr>
+		{% for form in addparser %}
+			<tr>
+			<td align="right">{{form.name}}</td>
+			<td>{{form}}</td>
+			</tr>
+		{% endfor %}
+		<tr><td></td><td><button type="submit" name="add_parser" value="add_parser" class="submit_button">Submit</button></td></tr>
+		</table>
+		</form>
+		{% for msg in msgs %}
+		<div><span class="{% if validparser %}class_warning{% else %}class_fatal{% endif %}"><strong>{{msg}}</strong></span></div>
+		{% endfor %}
+	</div>
+	<div id="tab_deal" class="tabcontent_left div_menu" style="display:none">
+		<form method="post">
+		<table id="table_adddeal">
+		<tr><td colspan="2" align="center" class="class_tablehead">Add Deal</td></tr>
+		{% for form in adddeal %}
+			<tr>
+			<td>{{form.name}}</td>
+			<td>{{form}}</td>
+			</tr>
+		{% endfor %}
+		<tr><td></td><td><button type="submit" name="add_deal" value="add_deal" class="submit_button">Submit</button></td></tr>
+		</table>
+		</form>
+	{% csrf_token %} 
+	</div>
+
+
 </div>
 {% load static %}
 <script src="{% static 'js/jquery.min.js' %}"></script>
@@ -44,17 +83,21 @@ function GetDealForThisParser(parsermenuId) {
 };
 
 </script>
-<div id="RightPanel" style="width: 50%; height: 100%; float: right;">
+<div id="RightPanel" style="width: 50%; height: 100%; float: right;" class="Panel">
+<div class="tab">
+	  <button class="tablinks">View</button>
+</div>
+<div class="tabcontent_right div_menu">
 <table>
-<td colspan="3">View Parsers</td>
 </tr>
 <tr>
-	<td align="left">Parser</td>
-	<td style="width:60%">{{ parsermenu.parser }}</td>
-	<td><button type="button" id="view_parser" onclick="GetDealForThisParser(parsermenuId=$('#id_parser').val())">View Parser</button></td> 
+	<td style="width:50%">{{ parsermenu.parser }}</td>
+	<td style="width:20%"><button type="button" id="view_parser" onclick="GetDealForThisParser(parsermenuId=$('#id_parser').val())" class="submit_button">View Deal</button></td> 
+	<td style="width:20%">{% if request.user.is_superuser %}<button type="button" id="del_parser" onclick="" class="submit_button">Delete Parser</button>{% endif %}</td>
 </tr>
 {% include "view_deal.html" %}
 </table>
 <div id="display_deal" style="width:100%;"></div>
+</div>
 </div>
 {% endblock %}

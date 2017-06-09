@@ -1,4 +1,5 @@
 from django import forms
+from parsers.models import Category, Parser
 
 class ContactForm(forms.Form):
     # TODO: Define form fields here
@@ -42,6 +43,14 @@ class AddParser(forms.Form):
     body = forms.CharField(widget=forms.Textarea(attrs={'cols': 30, 'rows': 10}))
     url = forms.URLField()
     filename = forms.CharField(max_length=100,min_length=1)
+
+class AddDeal(forms.Form):
+    title = forms.CharField(max_length=100,min_length=1)
+    website = forms.URLField()
+    filename = forms.CharField(max_length=100,min_length=1)
+    
+    def addparser(self, parsers):
+        self.fields['parser'] = forms.ChoiceField(zip(parsers, parsers))
 
 class SelectParser(forms.Form):
     def __init__(self, choices = None):

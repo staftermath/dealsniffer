@@ -1,8 +1,10 @@
-<table>
-	{% for key, value in dealresult.items%}
-	<tr>
-		<td>{{key}}</td>
-		<td>{{value}}</td>
-	</tr>
-	{% endfor %}
+{% load static %}
+<table class="deal-table">
+  {% for key, value in dealresult.items%}
+  <tr>
+  <td>{{key}}</td>
+  <td class="{% if key == 'Price' %}price{% else %}stock{% endif %}">{{value}}</td>
+  </tr>
+  {% endfor %}
+
 </table>

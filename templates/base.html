@@ -2,14 +2,15 @@
 
 <html lang="en">
 {% load static %}
-
-<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
 <head>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/tab.css' %}" />
     <title>{% block title %}{% endblock %}</title>
 </head>
-<body style="height: 100%; width:100%">
+<body>
 <div id="page-wrapper">
-    <h1>Project Deal Sniffer</h1>
+    <h1>PROJECT DEAL SNIFFER</h1>
+    <div class="navi">
     <a href="{% url 'homepage' %}">Home</a> | 
     <a href="{% url 'contact' %}">Contact Us</a> | 
     {% if request.user.is_authenticated %}
@@ -21,14 +22,17 @@
     <a href="{% url 'login' %}?next={% url 'homepage' %}">Login</a> |
     {% endif %} 
     <a href="https://github.com/staftermath/dealsniffer">GitHub</a>
+    </div>
     <hr>
     {% block content %}{% endblock %}
     {% block chart %}{% endblock %}
 
+    <div id="footer">
     {% block footer %}
     <hr style="width: 100%; height: 100%; float: bottom;">
-    <div style="width: 100%; height: 100%; float: bottom;">Thanks for visiting my site.</div>
+    <div style="width: 100%; height: 100%; float: bottom;">Thanks for visiting my site. <a href="{% url 'contact' %}">Contact Us</a></div>
     {% endblock %}
+    </div>
 </div>
 </body>
 </html>

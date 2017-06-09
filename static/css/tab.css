@@ -1,0 +1,111 @@
+button {
+  font-family: "Nunito", sans-serif;
+  cursor: pointer;
+  width: 100px;
+  display: inline-block;
+  background-color: #353535;
+  color: #66d9ef;
+  text-align: center;
+  transition: .25s ease;
+  border: 1px solid #0077B0;
+  padding: 5px;
+  border-radius: 4px 4px 0 0;
+  
+}
+
+.div_menu {
+  /*background-color: #424242;*/
+  color: #039;
+  /*box-shadow: 2px 2px 2px #888888;*/
+}
+
+/*.submit_button {
+	box-shadow: 2px 2px 2px 2px #888888;
+}*/
+
+select {
+/*	background-color: ##baffda;*/
+	width: 100%;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 1px;
+	border: 1px solid #0077B0;
+	/*font-size: 16px;*/
+	/*height: 34px;*/
+/*	width: 268px;*/
+}
+/*@import url(https://fonts.googleapis.com/css?family=Nunito:300);*/
+.submit_button
+{
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-align: center;
+  color: #0C5;
+
+  font-family: "Nunito", sans-serif;
+  font-weight: 300;
+  
+/*  margin: 5em auto;*/
+   
+  padding: 4px 0;
+/*  width: 220px;
+  height:30px;*/
+
+  background: #353535;
+  border: 1px solid #0077B0;
+  color: #66d9ef;
+  overflow: hidden;
+  
+  transition: all 0.5s;
+}
+
+.submit_button:hover, .submit_button:active 
+{
+  text-decoration: none;
+  color: #60d0e0;
+  border-color: #0099FF;
+  background: #505050;
+}
+
+.submit_button span 
+{
+  display: inline-block;
+  position: relative;
+  padding-right: 0;
+  
+  transition: padding-right 0.5s;
+}
+
+.submit_button span:after 
+{
+  content: ' ';  
+  position: absolute;
+  top: 0;
+  right: -18px;
+  opacity: 0;
+  width: 10px;
+  height: 10px;
+  margin-top: -10px;
+
+  background: rgba(0, 0, 0, 0);
+  border: 3px solid #FFF;
+  border-top: none;
+  border-right: none;
+
+  transition: opacity 0.5s, top 0.5s, right 0.5s;
+  transform: rotate(-45deg);
+}
+
+.submit_button:hover span, .submit_button:active span 
+{
+  padding-right: 30px;
+}
+
+.submit_button:hover span:after, .submit_button:active span:after 
+{
+  transition: opacity 0.5s, top 0.5s, right 0.5s;
+  opacity: 1;
+  border-color: #0C5;
+  right: 0;
+  top: 50%;
+}
