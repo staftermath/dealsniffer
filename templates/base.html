@@ -3,8 +3,7 @@
 <html lang="en">
 {% load static %}
 <head>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/tab.css' %}" />
+    <script type="text/javascript" src="{% static 'js/functions.js' %}"></script>
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
@@ -35,4 +34,6 @@
     </div>
 </div>
 </body>
+<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/tab.css' %}" />
 </html>

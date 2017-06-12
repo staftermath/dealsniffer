@@ -1,6 +1,26 @@
 from django import forms
 from parsers.models import Category, Parser
 
+# customized field
+# credit to https://stackoverflow.com/questions/24783275/django-form-with-choices-but-also-with-freetext-option
+class ListTextWidget(forms.TextInput):
+    def __init__(self, selection, name, *args, **kwargs):
+        super(ListTextWidget, self).__init__(*args, **kwargs)
+        self._name = name
+        self._list = selection
+        self.attrs.update({'list':'list__%s' % self._name})
+
+    def render(self, name, value, attrs=None):
+        text_html = super(ListTextWidget, self).render(name, value, attrs=attrs)
+        selection = '<datalist id="list__%s">' % self._name
+        for item in self._list:
+            selection += '<option value="%s">' % item
+        selection += '</datalist>'
+
+        return (text_html + selection)
+
+# =============
+
 class ContactForm(forms.Form):
     # TODO: Define form fields here
     subject = forms.CharField(max_length=100)
@@ -41,23 +61,36 @@ class SelectCategory(forms.Form):
 class AddParser(forms.Form):
     name = forms.CharField(max_length=100,min_length=1)
     body = forms.CharField(widget=forms.Textarea(attrs={'cols': 30, 'rows': 10}))
-    url = forms.URLField()
     filename = forms.CharField(max_length=100,min_length=1)
 
 class AddDeal(forms.Form):
     title = forms.CharField(max_length=100,min_length=1)
     website = forms.URLField()
-    filename = forms.CharField(max_length=100,min_length=1)
+    # filename = forms.CharField(max_length=100,min_length=1)
     
     def addparser(self, parsers):
         self.fields['parser'] = forms.ChoiceField(zip(parsers, parsers))
+
+class AddCategory(forms.Form):
+    brand = forms.CharField(max_length=50,min_length=1)
+    mainclass = forms.CharField(max_length=50,min_length=1)
+    subclass = forms.CharField(max_length=50,min_length=1)
+    def __init__(self, brand, mainclass, subclass):
+        super(AddCategory, self).__init__()
+        self.fields['brand'].widget = ListTextWidget(selection=brand, \
+                                                    name='band-list')
+        self.fields['mainclass'].widget = ListTextWidget(selection=mainclass, \
+                                                         name='mainclass-list')
+        self.fields['subclass'].widget = ListTextWidget(selection=subclass, \
+                                                        name='subclass-list')
 
 class SelectParser(forms.Form):
     def __init__(self, choices = None):
         self.choices = choices
         super(SelectParser, self).__init__()
         if self.choices:
-            self.fields['parser'] = forms.ChoiceField(zip(self.choices,self.choices))
+            choices = list(zip(self.choices,self.choices))
+            self.fields['parser'] = forms.ChoiceField(choices=choices, initial=choices[0])
 
     def AddItem(self, item):
         if item:

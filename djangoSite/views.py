@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 # from django.core.serializers import serialize
 # from django.core.serializers.json import DjangoJSONEncoder
 from django import forms
-from .forms import ContactForm, SelectDeal, SelectCategory, AddParser, SelectParser, AddDeal
+from .forms import ContactForm, SelectDeal, SelectCategory, AddParser, SelectParser, AddDeal, AddCategory
 import datetime
 import pytz
 import json
@@ -16,7 +16,7 @@ import os
 from django.conf import settings
 from books.models import Book, Publisher
 from parsers.models import Deal, Category, Parser, Price
-from .functions import ParseDeal, ParserValidate
+from .functions import ParseDeal, ParserValidate, GetAllCategory
 # from settings import BASE_DIR
 def datetime_handler(x):
     if isinstance(x, datetime.datetime):
@@ -110,14 +110,14 @@ def addparser(request):
 	allParsers = [x[0] for x in allParsers]
 	menu = SelectParser(choices=allParsers)
 	dealform.addparser(allParsers)
-	print(dealform)
+	allCategory = GetAllCategory()
+	categoryForm = AddCategory(*allCategory)
 	if request.method == "POST":
 		if request.POST.get('add_parser')=='add_parser':
 			name = request.POST['name']
 			parser = request.POST['body']
 			filename = request.POST['filename']
 			filepath = os.path.join(settings.BASE_DIR, 'parsers','parserfiles',filename)
-			print(filepath)
 			msgs, validParser = ParserValidate(parser)
 			if validParser:
 				with open(filepath, 'w') as file:
@@ -130,6 +130,7 @@ def addparser(request):
 					msgs.append("Could not save new parser")
 			return render(request, 'view_parser.html', {"addparser":parserform, \
 														"adddeal":dealform,\
+														"categoryform":categoryForm,\
 														"parsermenu":menu, \
 														"allParsers":allParsers, \
 														"msgs":msgs, \
@@ -138,15 +139,30 @@ def addparser(request):
 			title = request.POST['title']
 			website = request.POST['website']
 			parsername = request.POST['parser']
-			parserID = [x[0] for x in Parser.objects.filter(name=parsername).values('id')[0]]
-			newdeal = Deal(title=title, website=website, parser = parserID)
+			brand = request.POST['brand']
+			mainclass = request.POST['mainclass']
+			subclass = request.POST['subclass']
+			
+			parserID = Parser.objects.filter(name=parsername)[0]
+			msgs = []
+			newCategory = Category(brand=brand, mainclass=mainclass, subclass=subclass)
+			if Category.objects.filter(brand=brand, mainclass=mainclass, subclass=subclass).count() == 0:
+				try:
+					newCategory.save()
+					msgs.append("New Category Saved")
+				except:
+					msgs.append("Could not save new deal")
+			targetCategory = Category.objects.filter(brand=brand, mainclass=mainclass, subclass=subclass)[0]
+			newdeal = Deal(title=title, website=website, parser = parserID, category=targetCategory)
 			try:
 				newdeal.save()
 				msgs.append("New Deal Saved")
 			except:
 				msgs.append("Could not save new deal")
+			
 			return render(request, 'view_parser.html', {"addparser":parserform, \
 														"adddeal":dealform,\
+														"categoryform":categoryForm,\
 														"parsermenu":menu, \
 														"allParsers":allParsers, \
 														"msgs":msgs})
@@ -163,12 +179,14 @@ def addparser(request):
 					  "parser":parsername}
 		return render(request, 'view_parser.html', {"addparser":parserform, \
 													"adddeal":dealform,\
+													"categoryform":categoryForm,\
 													"parsermenu":menu, \
 													"lastResult":lastResult, \
 													"testresult": testResult, \
 													"allParsers":allParsers})
 	return render(request, 'view_parser.html', {"addparser":parserform, \
 												"adddeal":dealform,\
+												"categoryform":categoryForm,\
 												"parsermenu":menu, \
 												"allParsers":allParsers})
 

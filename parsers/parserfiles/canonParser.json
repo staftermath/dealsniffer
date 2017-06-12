@@ -1,3 +1,17 @@
-{"inStock": "\"availability\".*\"InStock\">(In Stock)",
-"Price": "<meta itemprop=\"price\" content=\"([0-9.]*)\"",
-"default":{"inStock":"Out Of Stock", "Price": "---"}}
+{
+  "inStock": {
+    "values": [
+      "\"availability\".*\"InStock\">(In Stock)"
+    ],
+    "type": "string",
+    "default": "Out Of Stock"
+  },
+  "Price": {
+    "values": [
+      "<meta itemprop=\"price\" content=\"([0-9.]*)\""
+    ],
+    "type": "string",
+    "default": "---",
+    "prefix": "$ "
+  }
+}
