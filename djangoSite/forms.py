@@ -90,8 +90,11 @@ class SelectParser(forms.Form):
         super(SelectParser, self).__init__()
         if self.choices:
             choices = list(zip(self.choices,self.choices))
-            self.fields['parser'] = forms.ChoiceField(choices=choices, initial=choices[0])
+            self.fields['parser'] = forms.ChoiceField(widget=forms.Select(attrs={'id': 'form_select_parser'}),\
+                                                      choices=choices, \
+                                                      initial=choices[0])
 
     def AddItem(self, item):
         if item:
-            self.fields['parser'] = forms.ChoiceField(zip(item,item))
+            self.fields['parser'] = forms.ChoiceField(widget=forms.Select(attrs={'id': 'form_select_parser'}),\
+                                                      choices=zip(item,item))
