@@ -55,6 +55,7 @@ def ParseDeal(url, parserloc):
 	content = r.text
 	with open(parserloc, 'r') as file:
 		parserDict = json.load(file)
+	print(parserDict)
 	result = dict()
 	for _, key in enumerate(parserDict):
 		thisEntry = parserDict[key]
@@ -71,9 +72,11 @@ def ParseDeal(url, parserloc):
 										  thisEntry["values"][i])
 			pattern = re.compile(thisEntry["values"][lenOfPatterns-1])
 			searchResult = pattern.findall(parsed)
+			print("Search Result:")
+			print(searchResult)
 			if (len(searchResult) > 0):
 				if thisEntry.get("type", "") == "logical":
-					result[key] = thisEntry["match"]
+					result[key] = thisEntry.get("match")
 				else:
 					result[key] = searchResult[0]
 			else:

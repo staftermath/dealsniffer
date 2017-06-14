@@ -1,4 +1,18 @@
-{"inStock": "\"price-box\".*<strong>([0-9.]*)</strong>",
-"Price": "\"price-box\".*<strong>([0-9.]*)</strong>",
-"default":{"inStock":"Out Of Stock", "Price": "---"}}
-
+{
+  "inStock": {
+    "values": [
+      "class=\"price\".*<strong>([0-9.]*)</strong>"
+    ],
+    "type": "logical",
+    "default": "Out Of Stock haha",
+    "match": "In Stock"
+  },
+  "Price": {
+    "values": [
+      "class=\"price\".*<strong>([0-9.]*)</strong>"
+    ],
+    "type": "string",
+    "default": "---",
+    "prefix": "$ "
+  }
+}
