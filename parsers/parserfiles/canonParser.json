@@ -1,2 +1,17 @@
-{"inStockParser": "\"availability\".*\"InStock\">(In Stock)",
-"priceParser": "<meta itemprop=\"price\" content=\"([0-9.]*)\""}
+{
+  "inStock": {
+    "values": [
+      "\"availability\".*\"InStock\">(In Stock)"
+    ],
+    "type": "string",
+    "default": "Out Of Stock"
+  },
+  "Price": {
+    "values": [
+      "<meta itemprop=\"price\" content=\"([0-9.]*)\""
+    ],
+    "type": "string",
+    "default": "---",
+    "prefix": "$ "
+  }
+}

@@ -1,0 +1,12 @@
+#page-wrapper {
+     width: 800px;
+     margin: 0 auto;
+}
+.class_warning {
+	color: #8a6d3b;
+}
+.class_fatal {
+	color: #a94442;
+}
+
+

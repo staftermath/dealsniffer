@@ -2,19 +2,22 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.core.mail import send_mail
 from django.http import JsonResponse
-from django.views.generic import ListView, DetailView
+# from django.views.generic import ListView, DetailView
 from django.contrib.auth import authenticate, login, logout
-from django.core.serializers import serialize
-from django.core.serializers.json import DjangoJSONEncoder
+# from django.core.serializers import serialize
+# from django.core.serializers.json import DjangoJSONEncoder
 from django import forms
-from .forms import ContactForm, SelectDeal, SelectCategory
+from .forms import ContactForm, SelectDeal, SelectCategory, AddParser, SelectParser, AddDeal, AddCategory
 import datetime
 import pytz
 import json
 import calendar
+import os
+from django.conf import settings
 from books.models import Book, Publisher
-from parsers.models import Deal, Category
-
+from parsers.models import Deal, Category, Parser, Price
+from .functions import ParseDeal, ParserValidate, GetAllCategory
+# from settings import BASE_DIR
 def datetime_handler(x):
     if isinstance(x, datetime.datetime):
         return x.isoformat()
@@ -32,20 +35,6 @@ def profile(request):
 def logout_user(request):
 	logout(request)
 	return render(request, 'log_out.html')
-
-def search(request):
-	error = False
-	if 'q' in request.GET:
-		q = request.GET['q']
-		if not q:
-			error = True
-		else:
-			books = Book.objects.filter(title__icontains=q)
-			return render(request, 'search_results.html',\
-					  {'books': books, 'query':q})
-	return render(request, 'search_form.html', \
-					 {'error':error})
-
 
 def dealtrend(request):
 	allCategories = Category.objects.all()
@@ -65,17 +54,6 @@ def dealtrend(request):
 				allDealsSelected = Deal.objects.filter(category=categorySelected)
 				dealList = list(allDealsSelected.values_list('title', flat=True).distinct())
 				menuDict[brand][mainclass][subclass] = dealList
-	# if 'title' in request.GET:
-	# 	title = request.GET.get('title', default="")
-	# 	brand = request.GET.get('brand', default="")
-	# 	mainclass = request.GET.get('mainclass', default="")
-	# 	subclass = request.GET.get('subclass', default="")
-	# 	selected = dict(zip(["brand","mainclass","subclass","title"],[brand, mainclass, subclass, title]))
-	# 	print(selected)
-	# 	rawData = list(Deal.objects.filter(title=title).values('date', 'price'))
-	# 	return render(request, 'chart.html', {"menuDict":json.dumps(menuDict), \
-	# 		"data":json.dumps(rawData, default=datetime_handler).encode('utf8'), \
-	# 		"selected":json.dumps(selected)})
 	return render(request, 'chart.html', {"menuDict":json.dumps(menuDict)})
 
 def plottrend(request):
@@ -86,19 +64,23 @@ def plottrend(request):
 	category = Category.objects.filter(brand=brand, mainclass=mainclass,subclass=subclass)
 	if (category.count() > 0):
 		category = category[0]
-		rawData = list(Deal.objects.filter(title=title, category=category).values('date', 'price'))
+		thisdeal = Deal.objects.filter(title=title, category=category).distinct()[0]
+		rawData = list(Price.objects.filter(deal=thisdeal).values('date', 'price'))
+		# rawData = list(Deal.objects.filter(title=title, category=category).values('date', 'price'))
 	else:
 		rawData = None
 	return render(request, 'deal_trend.html', {"data":json.dumps(rawData,default=datetime_handler).encode('utf8'),\
 		"title":title})
 
-
-def generate_deal_data(request, item=None):
-	if not item:
-		data = list(Deal.objects.values('date', 'price'))
-	else:
-		data = list(Deal.objects.filter(title=item).values('date', 'price'))
-	return JsonResponse(data, safe=False)
+def grabdeal(request):
+	parser = request.GET.get('parser', default="")
+	objectParser = list(Parser.objects.filter(name=parsername).values('filepath'))[0]
+	alldeals = [x[0] for x in list(Deal.objects.filter(parser=objectParser))]
+	thisdealURL = list(Deal.objects.filter(title=title).values('website'))[0]
+	testResult = ParseDeal(url=thisdealURL['website'], parserloc=objectParser['filepath'])
+	testResult['inStock'] = testResult.get('testResult', "Out Of Stock")
+	lastResult = {"title":title, \
+				  "parser":parsername}
 
 def contact(request):
 	if request.method == 'POST':
@@ -121,27 +103,109 @@ def PassDjangoData(request):
     data = Deal.objects.all()
     return JsonResponse(list(data), safe=False)
 
-class PublisherList(ListView):
-	model = Publisher
+def addparser(request):
+	parserform = AddParser()
+	dealform = AddDeal()
+	allParsers = list(Parser.objects.values_list('name'))
+	allParsers = [x[0] for x in allParsers]
+	menu = SelectParser(choices=allParsers)
+	dealform.addparser(allParsers)
+	allCategory = GetAllCategory()
+	categoryForm = AddCategory(*allCategory)
+	if request.method == "POST":
+		if request.POST.get('add_parser')=='add_parser':
+			name = request.POST['name']
+			parser = request.POST['body']
+			filename = request.POST['filename']
+			filepath = os.path.join(settings.BASE_DIR, 'parsers','parserfiles',filename)
+			msgs, validParser = ParserValidate(parser)
+			if validParser:
+				with open(filepath, 'w') as file:
+					print(parser, file=file)
+				parserData = Parser(name=name, filepath=filepath)
+				try:
+					parserData.save()
+					msgs.append("New Parser Saved!")
+				except:
+					msgs.append("Could not save new parser")
+			return render(request, 'view_parser.html', {"addparser":parserform, \
+														"adddeal":dealform,\
+														"categoryform":categoryForm,\
+														"parsermenu":menu, \
+														"allParsers":allParsers, \
+														"msgs":msgs, \
+														"validparser":validParser})
+		if request.POST.get('add_deal')=='add_deal':
+			title = request.POST['title']
+			website = request.POST['website']
+			parsername = request.POST['parser']
+			brand = request.POST['brand']
+			mainclass = request.POST['mainclass']
+			subclass = request.POST['subclass']
+			
+			parserID = Parser.objects.filter(name=parsername)[0]
+			msgs = []
+			newCategory = Category(brand=brand, mainclass=mainclass, subclass=subclass)
+			if Category.objects.filter(brand=brand, mainclass=mainclass, subclass=subclass).count() == 0:
+				try:
+					newCategory.save()
+					msgs.append("New Category Saved")
+				except:
+					msgs.append("Could not save new deal")
+			targetCategory = Category.objects.filter(brand=brand, mainclass=mainclass, subclass=subclass)[0]
+			newdeal = Deal(title=title, website=website, parser = parserID, category=targetCategory)
+			try:
+				newdeal.save()
+				msgs.append("New Deal Saved")
+			except:
+				msgs.append("Could not save new deal")
+			
+			return render(request, 'view_parser.html', {"addparser":parserform, \
+														"adddeal":dealform,\
+														"categoryform":categoryForm,\
+														"parsermenu":menu, \
+														"allParsers":allParsers, \
+														"msgs":msgs})
 
-class PublisherDetail(DetailView):
-	model = Publisher
+	if request.method == "GET" and request.GET.get('test_parser')=='Test Parser':
+		print(request.GET)
+		parsername = request.GET.get('parser')
+		objectParser = list(Parser.objects.filter(name=parsername).values('filepath'))[0]
+		title = request.GET.get('deal_menu')
+		thisdealURL = list(Deal.objects.filter(title=title).values('website'))[0]
+		testResult = ParseDeal(url=thisdealURL['website'], parserloc=objectParser['filepath'])
+		testResult['inStock'] = testResult.get('testResult', "Out Of Stock")
+		lastResult = {"title":title, \
+					  "parser":parsername}
+		return render(request, 'view_parser.html', {"addparser":parserform, \
+													"adddeal":dealform,\
+													"categoryform":categoryForm,\
+													"parsermenu":menu, \
+													"lastResult":lastResult, \
+													"testresult": testResult, \
+													"allParsers":allParsers})
+	return render(request, 'view_parser.html', {"addparser":parserform, \
+												"adddeal":dealform,\
+												"categoryform":categoryForm,\
+												"parsermenu":menu, \
+												"allParsers":allParsers})
 
-	def get_context_data(self, **kwargs):
-		context = super(PublisherDetail, self).get_context_data(**kwargs)
-		context['book_list'] = Book.objects.all()
-		return context
 
-class PublisherBookList(ListView):
-	template_name = 'books/books_by_publisher.html'
-	"""docstring for PublisherBookList"""
-	def get_queryset(self):
-		self.publisher = get_object_or_404(Publisher, name=self.args[0])
-		return Books.objects.filter(publisher=self.publisher)
 
-	def get_context_data(self, **kwargs):
-		context = super(PublisherBookList, self).get_context_data(**kwargs)
+def generate_deal_data(request):
+	parser = request.GET.get('parser', default="")
+	deal = request.GET.get('deal', default="")
+	parserloc = list(Parser.objects.filter(name=parser).values_list("filepath"))[0][0]
+	url = list(Deal.objects.filter(title=deal).values("website"))[0].get("website", "")
+	dealresult = ParseDeal(url=url, parserloc=parserloc)
+	return render(request, "display_deal.html", {"dealresult":dealresult})
 
-		context['publisher'] = self.publisher
-		return context
 
+def get_deal_for_parser(request, parser=None):
+	if request.GET.get('parser'):
+		objectParser = list(Parser.objects.filter(name=request.GET['parser']))[0]
+		dealList = list(Deal.objects.filter(parser=objectParser).values_list("title").distinct())
+		
+		return JsonResponse([x[0] for x in dealList], safe=False)
+	else:
+		return ""

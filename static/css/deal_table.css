@@ -1,0 +1,50 @@
+table {
+  font-family: "Nunito", sans-serif;
+  color: #66d9ef;
+}
+
+.deal-table {
+  max-width: 750px;
+  margin: 100px auto;
+}
+
+.silver, .plat {
+  float: left;
+  width: 250px;
+  background: rgba(255,255,255,1);
+  text-align: center;
+}
+
+.gold {
+  float: left;
+  position: relative;
+  width: 250px;
+  top: -50px;
+  padding: 50px 0;
+  background: rgba(52, 152, 219,1.0);
+  text-align: center;
+  border-radius: 5px;
+  
+  & > .price {
+    background: rgba(255,255,255,1);
+    color: rgba(0,0,0,.7);
+  }
+
+  & > h1, & > h2, & > p, & > span {
+    color: rgba(255,255,255,1);
+  }
+}
+
+
+.price {
+  height: 100px;
+  width: 100px;
+  text-align: center;
+  background-color: rgba(231, 76, 60,1.0);
+  border-radius: 50%;
+  line-height: 100px;
+  color: #fff;
+  font-size: 1.5em;
+  font-weight: 100;
+  margin: 20px auto;
+}

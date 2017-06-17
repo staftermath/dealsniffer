@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title%}Add and View Parsers{% endblock %}
+{% block content %}
+<script type="text/javascript">
+	
+	function hideAllTabs(tabclass){
+		$('.'+tabclass).each(function(index, item){$(item).attr('style','display:none')});
+	}
+
+	function showTab(id, tabclass){
+		hideAllTabs(tabclass=tabclass);
+		var myElement = document.getElementById(id);
+		myElement.style.display = 'inherit';
+	}
+
+</script>
+<div id="LeftPanel" style="width: 50%; height: 100%; float: left;">
+	<div class="tab">
+	  <button class="tablinks" onclick="showTab('tab_parser','tabcontent')">Add Parser</button>
+	  <button class="tablinks" onclick="showTab('tab_deal','tabcontent')">Add Deal</button>
+	</div>
+
+	<div id="tab_parser" class="tabcontent">
+		<form method="post">
+		<table id="table_addparser">
+		<tr><td colspan="2" align="center" class="class_tablehead">Add Parsers</td></tr>
+		{% for form in addparser %}
+			<tr>
+			<td>{{form.name}}</td>
+			<td>{{form}}</td>
+			</tr>
+		{% endfor %}
+		<tr><td></td><td><button type="submit" name="add_parser">Submit</button></td></tr>
+		</table>
+		</form>
+		{% for msg in msgs %}
+		<div><span class="{% if validparser %}class_warning{% else %}class_fatal{% endif %}"><strong>{{msg}}</strong></span></div>
+		{% endfor %}
+	</div>
+	<div id="tab_deal" class="tabcontent" style="display:none">
+		<form method="post">
+		<table id="table_adddeal">
+		<tr><td colspan="2" align="center" class="class_tablehead">Add Deal</td></tr>
+		{% for form in adddeal %}
+			<tr>
+			<td>{{form.name}}</td>
+			<td>{{form}}</td>
+			</tr>
+		{% endfor %}
+		<tr><td></td><td><button type="submit" name="add_deal">Submit</button></td></tr>
+		</table>
+		</form>
+	{% csrf_token %} 
+	</div>
+
+
+</div>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script type="text/javascript">
+function GetDealForThisParser(parsermenuId) {
+	console.log("Getting parser: "+parsermenuId)
+	var url = "{% url 'api_deal_for_parser' %}" + "?parser=" + parsermenuId
+	console.log(url)
+	var deals = jQuery.when(jQuery.getJSON(url)).done(
+		function(json) {
+			$("#deal_menu").html("");
+			for (var i = 0; i< json.length; i++)
+			{
+				$("#deal_menu").append($('<option/>', { 
+			        value: json[i],
+			        text : json[i]
+				    }));
+					if (i==0) {
+						$("#deal_menu").children().last().attr("selected","selected");
+					}
+			}
+						});
+
+};
+
+</script>
+<div id="RightPanel" style="width: 50%; height: 100%; float: right;">
+<table>
+<td colspan="3">View Parsers</td>
+</tr>
+<tr>
+	<td align="left">Parser</td>
+	<td style="width:50%">{{ parsermenu.parser }}</td>
+	<td style="width:20%"><button type="button" id="view_parser" onclick="GetDealForThisParser(parsermenuId=$('#id_parser').val())">View Parser</button></td> 
+	<td style="width:20%">{% if request.user.is_superuser %}<button type="button" id="del_parser" onclick="">Delete Parser</button>{% endif %}</td>
+</tr>
+{% include "view_deal.html" %}
+</table>
+<div id="display_deal" style="width:100%;"></div>
+</div>
+{% endblock %}

@@ -1,0 +1,3 @@
+{"inStock": "\"availability\".*\"InStock\">(In Stock)",
+"Price": "<meta itemprop=\"price\" content=\"([0-9.]*)\"",
+"default":{"inStock":"Out Of Stock", "Price": "---"}}
