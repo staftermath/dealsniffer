@@ -99,8 +99,8 @@ function GetDealForThisParser(elem) {
 <table>
 </tr>
 <tr>
-	<td style="width:50%">{{ parsermenu.parser }}</td>
-	<td style="width:20%"><button type="button" id="view_parser" onclick="GetDealForThisParser(elem=document.getElementById('form_select_parser'))" class="submit_button">View Deal</button></td> 
+	<td style="width:50%">{{ parsermenu.modelquerymenu }}</td>
+	<td style="width:20%"><button type="button" id="view_parser" onclick="GetDealForThisParser(elem=document.getElementById('form_select_parser_view_deal'))" class="submit_button">View Deal</button></td> 
 	<td style="width:20%">{% if request.user.is_superuser %}<button type="button" id="del_parser" onclick="" class="submit_button">Delete Parser</button>{% endif %}</td>
 </tr>
 {% include "view_deal.html" %}

@@ -17,6 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import auth
 from django.contrib import admin
 from djangoSite import views
+# from access.views import view_user_deal
 
 urlpatterns = [
     url('^', include('django.contrib.auth.urls'), name='login'),
@@ -30,4 +31,5 @@ urlpatterns = [
     url(r'^api/plottrend/$', views.plottrend, name='api_plottrend'),
     url(r'^api/getdeal/$', views.generate_deal_data, name='api_getdeal'),
     url(r'^api/getdealforthisparser/$', views.get_deal_for_parser, name='api_deal_for_parser'),
+    # url(r'^user_deal/$', view_user_deal, name='view_user_deal'),
 ]

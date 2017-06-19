@@ -2,12 +2,12 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.core.mail import send_mail
 from django.http import JsonResponse
-# from django.views.generic import ListView, DetailView
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout
 # from django.core.serializers import serialize
 # from django.core.serializers.json import DjangoJSONEncoder
 from django import forms
-from .forms import ContactForm, SelectDeal, SelectCategory, AddParser, SelectParser, AddDeal, AddCategory
+from .forms import ContactForm, SelectDeal, SelectCategory, AddParser, SelectParser, AddDeal, AddCategory, QueryMenu
 import datetime
 import pytz
 import json
@@ -17,6 +17,7 @@ from django.conf import settings
 from books.models import Book, Publisher
 from parsers.models import Deal, Category, Parser, Price
 from .functions import ParseDeal, ParserValidate, GetAllCategory
+from access.models import DealAccess
 # from settings import BASE_DIR
 def datetime_handler(x):
     if isinstance(x, datetime.datetime):
@@ -24,13 +25,18 @@ def datetime_handler(x):
     raise TypeError("Unknown type")
 
 def index(request):
-	return render(request, 'index.html')
+	user = request.user#User.objects.get(username=username)
+	accessibleDeal = DealAccess.objects.filter(user=user)
+	menuUserDealAccessible = QueryMenu(queryset=accessibleDeal, id="menu_user_deal_accessible")
+	return render(request, 'index.html', {"menuUserDealAccessible":menuUserDealAccessible})
 
 
 def profile(request):
 	user = request.user#User.objects.get(username=username)
+	accessibleDeal = DealAccess.objects.filter(user=user)
+	menuUserDealAccessible = QueryMenu(queryset=accessibleDeal, id="menu_user_deal_accessible")
 	return render(request, 'user_profile.html', \
-		{"user":user})
+		{"menuUserDealAccessible": menuUserDealAccessible})
 
 def logout_user(request):
 	logout(request)
@@ -103,13 +109,17 @@ def PassDjangoData(request):
     data = Deal.objects.all()
     return JsonResponse(list(data), safe=False)
 
+@staff_member_required
 def addparser(request):
+	print(request.user.is_staff)
 	parserform = AddParser()
 	dealform = AddDeal()
-	allParsers = list(Parser.objects.values_list('name'))
-	allParsers = [x[0] for x in allParsers]
-	menu = SelectParser(choices=allParsers)
-	dealform.addparser(allParsers)
+	# allParsers = list(Parser.objects.values_list('name'))
+	# allParsers = [x[0] for x in allParsers]
+	# menu = SelectParser(choices=allParsers)
+	allParsers = Parser.objects.all()
+	menu = QueryMenu(queryset=allParsers, id="form_select_parser_view_deal")
+	dealform.addparser(queryset=allParsers, id="form_select_parser_add_deal")
 	allCategory = GetAllCategory()
 	categoryForm = AddCategory(*allCategory)
 	if request.method == "POST":
@@ -193,17 +203,26 @@ def addparser(request):
 
 
 def generate_deal_data(request):
-	parser = request.GET.get('parser', default="")
-	deal = request.GET.get('deal', default="")
-	parserloc = list(Parser.objects.filter(name=parser).values_list("filepath"))[0][0]
-	url = list(Deal.objects.filter(title=deal).values("website"))[0].get("website", "")
+	#print(request.GET.keys())
+	# parser = request.GET.get('parser', default="")
+	# deal = request.GET.get('deal', default="")
+	# parserloc = list(Parser.objects.filter(name=parser).values_list("filepath"))[0][0]
+	# url = list(Deal.objects.filter(title=deal).values("website"))[0].get("website", "")
+	# dealresult = ParseDeal(url=url, parserloc=parserloc)
+	# parser = request.GET.get('parser', default="")
+	dealTitle = request.GET.get('deal', default="")
+	deal = Deal.objects.filter(title=dealTitle)[0]
+	print("passed here")
+	parser = deal.parser
+	parserloc = parser.filepath
+	url = deal.website
 	dealresult = ParseDeal(url=url, parserloc=parserloc)
 	return render(request, "display_deal.html", {"dealresult":dealresult})
 
 
 def get_deal_for_parser(request, parser=None):
 	if request.GET.get('parser'):
-		objectParser = list(Parser.objects.filter(name=request.GET['parser']))[0]
+		objectParser = Parser.objects.filter(id=request.GET.get('parser'))
 		dealList = list(Deal.objects.filter(parser=objectParser).values_list("title").distinct())
 		
 		return JsonResponse([x[0] for x in dealList], safe=False)
