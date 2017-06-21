@@ -67,7 +67,6 @@
 
 </div>
 {% load static %}
-<script src="{% static 'js/jquery.min.js' %}"></script>
 <script type="text/javascript">
 function GetDealForThisParser(elem) {
 	// console.log("Getting parser: "+elem.options[elem.selectedIndex].value)
@@ -79,8 +78,8 @@ function GetDealForThisParser(elem) {
 			for (var i = 0; i< json.length; i++)
 			{
 				$("#deal_menu").append($('<option/>', { 
-			        value: json[i],
-			        text : json[i]
+			        value: json[i][0],
+			        text : json[i][1]
 				    }));
 					if (i==0) {
 						$("#deal_menu").children().last().attr("selected","selected");

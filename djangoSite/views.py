@@ -177,23 +177,23 @@ def addparser(request):
 														"allParsers":allParsers, \
 														"msgs":msgs})
 
-	if request.method == "GET" and request.GET.get('test_parser')=='Test Parser':
-		print(request.GET)
-		parsername = request.GET.get('parser')
-		objectParser = list(Parser.objects.filter(name=parsername).values('filepath'))[0]
-		title = request.GET.get('deal_menu')
-		thisdealURL = list(Deal.objects.filter(title=title).values('website'))[0]
-		testResult = ParseDeal(url=thisdealURL['website'], parserloc=objectParser['filepath'])
-		testResult['inStock'] = testResult.get('testResult', "Out Of Stock")
-		lastResult = {"title":title, \
-					  "parser":parsername}
-		return render(request, 'view_parser.html', {"addparser":parserform, \
-													"adddeal":dealform,\
-													"categoryform":categoryForm,\
-													"parsermenu":menu, \
-													"lastResult":lastResult, \
-													"testresult": testResult, \
-													"allParsers":allParsers})
+	# if request.method == "GET" and request.GET.get('test_parser')=='Test Parser':
+	# 	print(request.GET)
+	# 	parsername = request.GET.get('parser')
+	# 	objectParser = list(Parser.objects.filter(name=parsername).values('filepath'))[0]
+	# 	title = request.GET.get('deal_menu')
+	# 	thisdealURL = list(Deal.objects.filter(title=title).values('website'))[0]
+	# 	testResult = ParseDeal(url=thisdealURL['website'], parserloc=objectParser['filepath'])
+	# 	testResult['inStock'] = testResult.get('testResult', "Out Of Stock")
+	# 	lastResult = {"title":title, \
+	# 				  "parser":parsername}
+	# 	return render(request, 'view_parser.html', {"addparser":parserform, \
+	# 												"adddeal":dealform,\
+	# 												"categoryform":categoryForm,\
+	# 												"parsermenu":menu, \
+	# 												"lastResult":lastResult, \
+	# 												"testresult": testResult, \
+	# 												"allParsers":allParsers})
 	return render(request, 'view_parser.html', {"addparser":parserform, \
 												"adddeal":dealform,\
 												"categoryform":categoryForm,\
@@ -203,16 +203,8 @@ def addparser(request):
 
 
 def generate_deal_data(request):
-	#print(request.GET.keys())
-	# parser = request.GET.get('parser', default="")
-	# deal = request.GET.get('deal', default="")
-	# parserloc = list(Parser.objects.filter(name=parser).values_list("filepath"))[0][0]
-	# url = list(Deal.objects.filter(title=deal).values("website"))[0].get("website", "")
-	# dealresult = ParseDeal(url=url, parserloc=parserloc)
-	# parser = request.GET.get('parser', default="")
-	dealTitle = request.GET.get('deal', default="")
-	deal = Deal.objects.filter(title=dealTitle)[0]
-	print("passed here")
+	dealId = request.GET.get('deal', default="")
+	deal = Deal.objects.filter(id=dealId)[0]
 	parser = deal.parser
 	parserloc = parser.filepath
 	url = deal.website
@@ -223,8 +215,8 @@ def generate_deal_data(request):
 def get_deal_for_parser(request, parser=None):
 	if request.GET.get('parser'):
 		objectParser = Parser.objects.filter(id=request.GET.get('parser'))
-		dealList = list(Deal.objects.filter(parser=objectParser).values_list("title").distinct())
+		dealList = list(Deal.objects.filter(parser=objectParser).values_list("id","title").distinct())
 		
-		return JsonResponse([x[0] for x in dealList], safe=False)
+		return JsonResponse(dealList, safe=False)
 	else:
 		return ""

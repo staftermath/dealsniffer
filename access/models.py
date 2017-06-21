@@ -8,4 +8,4 @@ class DealAccess(models.Model):
 	deal = models.ForeignKey(Deal)
 	text = models.CharField(max_length=200, blank=True)
 	def __str__(self):
-		return str(self.user) + ": " + str(self.deal)
+		return self.deal.title

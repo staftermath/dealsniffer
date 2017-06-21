@@ -4,16 +4,6 @@
         </select>
         </td>
     	<td style="width:20%"><button type="button" name="get_deal" value="Get Deal"
-            onclick="GetDeal(deal=$('#deal_menu').val())" class="submit_button">Get Deal</button></td>
+            onclick="GetDeal(deal=$('#deal_menu').val(), targetid='display_deal', url='{% url 'api_getdeal'%}')" class="submit_button">Get Deal</button></td>
 </tr>
-
-<script type="text/javascript">
-{% load static %}
-function GetDeal(deal) {
-    // $(this).after("<img src='{% static 'image/pageLoad.gif' %}' alt='loading' />").fadeIn(); 
-    var url = "{% url 'api_getdeal'%}" + "?deal="+deal; //+ "&parser=" + parser;
-    console.log(url)
-    var template = '<object type="text/html" data="%URL%" style="height:100%; width:100%;"></object>';
-    document.getElementById("display_deal").innerHTML = template.replace("%URL%", url)
-}
 </script>

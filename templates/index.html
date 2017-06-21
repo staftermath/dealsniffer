@@ -2,7 +2,19 @@
 {% block title %}Home Page{% endblock %}
 {% block content %}
 <h2>{% if request.user.is_authenticated %}
-{{ request.user.username }}:
-{% endif %}Welcome to the Home Page</h2>
+Hi, {{ request.user.username }}!
+{% endif %} Welcome to the Home Page</h2>
 <hr>
+<table>
+	{% for form in menuUserDealAccessible %}
+	<tr>
+		<td>Select Deal</td>
+		<td>{{ form }}</td>
+		<td><button type="button" name="get_deal" value="Get Deal"
+            onclick="GetDeal(deal=$('#menu_user_deal_accessible').val(), targetid='display_deal', url='{% url 'api_getdeal'%}')" class="submit_button">Get Deal</button></td>
+	</tr>
+	{% endfor %}
+	{% csrf_token %}
+</table>
+<div id="display_deal" style="width:100%;"></div>
 {% endblock %}
