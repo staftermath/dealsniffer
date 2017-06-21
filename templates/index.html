@@ -5,6 +5,7 @@
 Hi, {{ request.user.username }}!
 {% endif %} Welcome to the Home Page</h2>
 <hr>
+{% if request.user.is_authenticated %}
 <table>
 	{% for form in menuUserDealAccessible %}
 	<tr>
@@ -16,5 +17,6 @@ Hi, {{ request.user.username }}!
 	{% endfor %}
 	{% csrf_token %}
 </table>
+{% endif %}
 <div id="display_deal" style="width:100%;"></div>
 {% endblock %}

@@ -26,9 +26,13 @@ def datetime_handler(x):
 
 def index(request):
 	user = request.user#User.objects.get(username=username)
-	accessibleDeal = DealAccess.objects.filter(user=user)
-	menuUserDealAccessible = QueryMenu(queryset=accessibleDeal, id="menu_user_deal_accessible")
-	return render(request, 'index.html', {"menuUserDealAccessible":menuUserDealAccessible})
+	if not user.is_anonymous():
+		accessibleDealId = list(DealAccess.objects.filter(user=user).values_list("deal", flat=True))
+		accessibleDeal = Deal.objects.filter(id__in=accessibleDealId)
+		menuUserDealAccessible = QueryMenu(queryset=accessibleDeal, id="menu_user_deal_accessible")
+		return render(request, 'index.html', {"menuUserDealAccessible":menuUserDealAccessible})
+	else:
+		return render(request, 'index.html')
 
 
 def profile(request):
