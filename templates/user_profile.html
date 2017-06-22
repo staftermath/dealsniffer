@@ -3,24 +3,30 @@
 User Profile
 {% endblock %}
 {% block content %}
-{% if user.is_authenticated %}
+{% if request.user.is_authenticated %}
 <table>
 <tr>
 	<td>Username:</td>
-	<td>{{ user.username }}</td>
+	<td>{{ request.user.username }}</td>
 </tr>
 <tr>
 	<td>E-mail:</td>
-	<td>{{ user.email }}</td>
+	<td>{{ request.user.email }}</td>
 </tr>
 <tr>
 	<td>First Name:</td>
-	<td>{{ user.first_name }}</td>
+	<td>{{ request.user.first_name }}</td>
 </tr>
 <tr>
 	<td>Last Name:</td>
-	<td>{{ user.last_name }}</td>
+	<td>{{ request.user.last_name }}</td>
 </tr>
+	{% for form in menuUserDealAccessible %}
+	<tr>
+		<td>{{ form.name}}</td>
+		<td>{{ form }}</td>
+	</tr>
+	{% endfor %}
 </table>
 {% else %}
 <h1>You need to log in to view your profile</h1>

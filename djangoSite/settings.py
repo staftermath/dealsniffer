@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'books',
     'parsers',
+    'access',
     'django_nvd3',
 ]
 

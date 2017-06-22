@@ -68,8 +68,9 @@ class AddDeal(forms.Form):
     website = forms.URLField()
     # filename = forms.CharField(max_length=100,min_length=1)
     
-    def addparser(self, parsers):
-        self.fields['parser'] = forms.ChoiceField(zip(parsers, parsers))
+    def addparser(self, queryset, id):
+        self.fields['parser'] = forms.ModelChoiceField(widget=forms.Select(attrs={'id': id}), \
+                                                               queryset= queryset)
 
 class AddCategory(forms.Form):
     brand = forms.CharField(max_length=50,min_length=1)
@@ -98,3 +99,11 @@ class SelectParser(forms.Form):
         if item:
             self.fields['parser'] = forms.ChoiceField(widget=forms.Select(attrs={'id': 'form_select_parser'}),\
                                                       choices=zip(item,item))
+
+class QueryMenu(forms.Form):
+    '''Create select menu containing accessible deals for user'''
+    modelquerymenu = None
+    def __init__(self, queryset, id):
+        super(QueryMenu, self).__init__()
+        self.fields['modelquerymenu'] = forms.ModelChoiceField(widget=forms.Select(attrs={'id': id}), \
+                                                               queryset= queryset)
