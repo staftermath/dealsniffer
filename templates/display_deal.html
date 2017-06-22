@@ -1,10 +1,13 @@
 {% load static %}
-<table class="deal-table">
-  {% for key, value in dealresult.items%}
-  <tr>
-  <td>{{key}}</td>
-  <td class="{% if key == 'Price' %}price{% else %}stock{% endif %}">{{value}}</td>
-  </tr>
-  {% endfor %}
+<div class="columns">
+  <ul class="price">
+    <li class="header {% if dealresult.inStock == 'In Stock' %}instock{% endif %}">{{dealresult.inStock}}</li>
+    <li class="price_value">{{dealresult.Price}}</li>
+    {% if dealresult.dealurl %}
+	<li><button type="button" name="goto_deal" value="Go To Deal"
+        onclick="window.open('{{ dealresult.dealurl }}');" class="submit_button">Go Now</button></li>
+{% endif %}
+  </ul>
+</div>
 
-</table>
+<link rel="stylesheet" type="text/css" href="{% static 'css/price_table.css' %}" />

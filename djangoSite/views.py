@@ -152,12 +152,12 @@ def addparser(request):
 		if request.POST.get('add_deal')=='add_deal':
 			title = request.POST['title']
 			website = request.POST['website']
-			parsername = request.POST['parser']
+			parserid = request.POST['parser']
 			brand = request.POST['brand']
 			mainclass = request.POST['mainclass']
 			subclass = request.POST['subclass']
 			
-			parserID = Parser.objects.filter(name=parsername)[0]
+			parserID = Parser.objects.filter(id=parserid)[0]
 			msgs = []
 			newCategory = Category(brand=brand, mainclass=mainclass, subclass=subclass)
 			if Category.objects.filter(brand=brand, mainclass=mainclass, subclass=subclass).count() == 0:
