@@ -23,7 +23,7 @@
     {% else %}
     <a href="{% url 'login' %}?next={% url 'homepage' %}">Login</a> |
     {% endif %} 
-    <a href="https://github.com/staftermath/dealsniffer">GitHub</a>
+    <a href="https://github.com/staftermath/dealsniffer" target="_blank">GitHub</a>
     </div>
     <hr>
     {% block content %}{% endblock %}
@@ -39,4 +39,5 @@
 </body>
 <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'css/tab.css' %}" />
+
 </html>

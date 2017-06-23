@@ -55,8 +55,7 @@ def ParseDeal(url, parserloc):
 	content = r.text
 	with open(parserloc, 'r') as file:
 		parserDict = json.load(file)
-	print(parserDict)
-	result = dict()
+	result = {"dealurl":url}
 	for _, key in enumerate(parserDict):
 		thisEntry = parserDict[key]
 		try:
@@ -87,7 +86,6 @@ def ParseDeal(url, parserloc):
 			result[key] = prefix + result[key] + suffix
 		except ParserException:
 			result[key] = thisEntry["default"]
-		print(result)
 	return result
 
 def LoadCSV(csvfile):

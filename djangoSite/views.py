@@ -26,6 +26,18 @@ def datetime_handler(x):
 
 def index(request):
 	user = request.user#User.objects.get(username=username)
+	msg = []
+	if user.is_staff:
+		accessibleDealId = set(DealAccess.objects.filter(user=user).values_list("deal", flat=True))
+		allDeals = set(Deal.objects.values_list("id", flat=True))
+		unsavedDeal = allDeals - accessibleDealId
+		for id in unsavedDeal:
+			dealaccess = DealAccess(user=user,deal=Deal.objects.filter(id=id)[0])
+			dealaccess.save()
+		if len(unsavedDeal) > 0:
+			msg.append(str(len(unsavedDeal)) + " new deals are saved for you as staff account")
+		else:
+			msg.append("No new deals added to your account")
 	if not user.is_anonymous():
 		accessibleDealId = list(DealAccess.objects.filter(user=user).values_list("deal", flat=True))
 		accessibleDeal = Deal.objects.filter(id__in=accessibleDealId)
@@ -152,12 +164,12 @@ def addparser(request):
 		if request.POST.get('add_deal')=='add_deal':
 			title = request.POST['title']
 			website = request.POST['website']
-			parsername = request.POST['parser']
+			parserid = request.POST['parser']
 			brand = request.POST['brand']
 			mainclass = request.POST['mainclass']
 			subclass = request.POST['subclass']
 			
-			parserID = Parser.objects.filter(name=parsername)[0]
+			parserID = Parser.objects.filter(id=parserid)[0]
 			msgs = []
 			newCategory = Category(brand=brand, mainclass=mainclass, subclass=subclass)
 			if Category.objects.filter(brand=brand, mainclass=mainclass, subclass=subclass).count() == 0:
@@ -181,23 +193,6 @@ def addparser(request):
 														"allParsers":allParsers, \
 														"msgs":msgs})
 
-	# if request.method == "GET" and request.GET.get('test_parser')=='Test Parser':
-	# 	print(request.GET)
-	# 	parsername = request.GET.get('parser')
-	# 	objectParser = list(Parser.objects.filter(name=parsername).values('filepath'))[0]
-	# 	title = request.GET.get('deal_menu')
-	# 	thisdealURL = list(Deal.objects.filter(title=title).values('website'))[0]
-	# 	testResult = ParseDeal(url=thisdealURL['website'], parserloc=objectParser['filepath'])
-	# 	testResult['inStock'] = testResult.get('testResult', "Out Of Stock")
-	# 	lastResult = {"title":title, \
-	# 				  "parser":parsername}
-	# 	return render(request, 'view_parser.html', {"addparser":parserform, \
-	# 												"adddeal":dealform,\
-	# 												"categoryform":categoryForm,\
-	# 												"parsermenu":menu, \
-	# 												"lastResult":lastResult, \
-	# 												"testresult": testResult, \
-	# 												"allParsers":allParsers})
 	return render(request, 'view_parser.html', {"addparser":parserform, \
 												"adddeal":dealform,\
 												"categoryform":categoryForm,\
