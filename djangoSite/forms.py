@@ -31,8 +31,8 @@ class ContactForm(forms.Form):
     def clean_message(self):
     	message = self.cleaned_data['message']
     	num_words = len(message.split())
-    	if num_words < 4:
-    		raise forms.ValidationError("Not enough words! Minimal 4")
+    	if num_words < 1:
+    		raise forms.ValidationError("Not enough words! Minimal 1")
     	return message
 
 class SelectDeal(forms.Form):

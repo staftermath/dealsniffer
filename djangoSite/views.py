@@ -113,9 +113,9 @@ def contact(request):
 				cd['subject'],
 				cd['message'],
 				cd.get('email', 'noreply@example.com'),
-				['siteowner@example.com']
+				['dealsniffer.com@gmail.com']
 				)
-			return HttpResponseRedirect('/contact/thanks/')
+			return HttpResponseRedirect('/')
 	else:
 		form = ContactForm(initial={'subject':'I love your site!'})
 	return render(request, 'contact_form.html', \
