@@ -142,3 +142,18 @@ def RecordPrice(dealId, queryset=None):
 			return None
 	return float(re.findall("([0-9.]+)", result['Price'])[0])
 
+def SavePrice(deal, price):
+	newprice = Price(deal=deal, price=price, date=datetime.datetime.utcnow())
+	try:
+		newprice.save()
+		return True
+	except:
+		return False
+
+def ScraperBatch():
+	dealQuery = Deal.object.all()
+	dealIdList = dealQuery.values_list("id")
+	for thisDeal in dealIdList:
+		price = RecordPrice(dealId=thisDeal.id, queryset=dealQuery)
+		if not price:
+			savesuccess = SavePrice(deal=thisDeal, price=price)
