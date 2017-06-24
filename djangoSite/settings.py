@@ -27,6 +27,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# EMAIL SERVER
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'dealsniffer.com'
+EMAIL_HOST_PASSWORD = 'pbkdf2_sha256$36000$4imvddbYYQCs$Lfi2AzPV8h8Fxr2DIQQtOmsRjh5OQc2P6WyHl407Nbo='
+#  pbkdf2_sha256$36000$4imvddbYYQCs$Lfi2AzPV8h8Fxr2DIQQtOmsRjh5OQc2P6WyHl407Nbo=  #
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 # Application definition
 

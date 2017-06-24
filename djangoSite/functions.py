@@ -71,8 +71,6 @@ def ParseDeal(url, parserloc):
 										  thisEntry["values"][i])
 			pattern = re.compile(thisEntry["values"][lenOfPatterns-1])
 			searchResult = pattern.findall(parsed)
-			print("Search Result:")
-			print(searchResult)
 			if (len(searchResult) > 0):
 				if thisEntry.get("type", "") == "logical":
 					result[key] = thisEntry.get("match")
@@ -100,27 +98,27 @@ def LoadCSV(csvfile):
 							   date=datetime.datetime.strptime(row[3], "%m/%d/%y %I:%M %p"))
 			price.save()
 
-def TrackingDeal(dealTitle):
-	deal = Deal.objects.filter(title=dealTitle).value("category", "website","parser").distinct()
-	if len(deal) > 1:
-		print("multiple url found. selecting first one.")
-	deal = deal[0]
-	parserloc = Parser.objects.filter(id=deal['parser']).values("filepath")[0]["filepath"]
-	dealresult = ParseDeal(url=deal['website'], parserloc=parserloc)
-	if dealresult:
-		if dealresult.get('inStock', 'Out Of Stock') != 'Out Of Stock':
-			price = dealresult.get('Price')
-			try:
-				float(price)
-			except ValueError:
-				print("Price is not float. Returned: " + price)
-				return False
-			newdeal = Deal(title=dealTitle, category=deal['category'], \
-				website=deal['website'], price=price, \
-				date=datetime.datetime.now(), parser=deal['parser'])
-			newdeal.save()
-			return True
-	return False
+# def TrackingDeal(dealTitle):
+# 	deal = Deal.objects.filter(title=dealTitle).value("category", "website","parser").distinct()
+# 	if len(deal) > 1:
+# 		print("multiple url found. selecting first one.")
+# 	deal = deal[0]
+# 	parserloc = Parser.objects.filter(id=deal['parser']).values("filepath")[0]["filepath"]
+# 	dealresult = ParseDeal(url=deal['website'], parserloc=parserloc)
+# 	if dealresult:
+# 		if dealresult.get('inStock', 'Out Of Stock') != 'Out Of Stock':
+# 			price = dealresult.get('Price')
+# 			try:
+# 				float(price)
+# 			except ValueError:
+# 				print("Price is not float. Returned: " + price)
+# 				return False
+# 			newdeal = Deal(title=dealTitle, category=deal['category'], \
+# 				website=deal['website'], price=price, \
+# 				date=datetime.datetime.now(), parser=deal['parser'])
+# 			newdeal.save()
+# 			return True
+# 	return False
 			
 
 def GetAllCategory():
@@ -130,3 +128,32 @@ def GetAllCategory():
 	subclasses = [x[0] for x in list(categoryObjects.values_list("subclass").distinct())]
 	return list(set(brands)), list(set(mainclasses)), list(set(subclasses))
 	
+def RecordPrice(dealId, queryset=None):
+	if not queryset:
+		queryset = Deal.objects.all()
+	thisDeal = queryset.filter(id=dealId)[0]
+	url = thisDeal.website
+	parserloc = thisDeal.parser.filepath
+	with open(parserloc, 'r') as file:
+		parserDict = json.load(file)
+	result = ParseDeal(url=url, parserloc=parserloc)
+	for _, key in enumerate(parserDict):
+		if result[key] == parserDict[key]["default"]:
+			return None
+	return float(re.findall("([0-9.]+)", result['Price'])[0])
+
+def SavePrice(deal, price):
+	newprice = Price(deal=deal, price=price, date=datetime.datetime.utcnow())
+	try:
+		newprice.save()
+		return True
+	except:
+		return False
+
+def ScraperBatch():
+	dealQuery = Deal.object.all()
+	dealIdList = dealQuery.values_list("id")
+	for thisDeal in dealIdList:
+		price = RecordPrice(dealId=thisDeal.id, queryset=dealQuery)
+		if not price:
+			savesuccess = SavePrice(deal=thisDeal, price=price)

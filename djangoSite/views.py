@@ -109,13 +109,14 @@ def contact(request):
 		form = ContactForm(request.POST)
 		if form.is_valid():
 			cd = form.cleaned_data
+			print()
 			send_mail(
 				cd['subject'],
-				cd['message'],
+				"from " + cd.get('email') + "\n============================\n" + cd['message'],
 				cd.get('email', 'noreply@example.com'),
-				['siteowner@example.com']
+				['dealsniffer.com@gmail.com']
 				)
-			return HttpResponseRedirect('/contact/thanks/')
+			return HttpResponseRedirect('/')
 	else:
 		form = ContactForm(initial={'subject':'I love your site!'})
 	return render(request, 'contact_form.html', \
