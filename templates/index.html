@@ -16,7 +16,13 @@ Hi, {{ request.user.username }}!
 	</tr>
 	{% endfor %}
 	{% csrf_token %}
+	<tr>
+		<td></td>
+		<td id="display_deal"></td>
+		<td></td>
+	</tr>
 </table>
 {% endif %}
-<div id="display_deal" style="width:100%;"></div>
+{% load static %}
+
 {% endblock %}

@@ -1,17 +1,17 @@
-* {
+#display_deal * {
     box-sizing: border-box;
     font-family: 'Nunito', sans-serif;
 }
 
 /* Create three columns of equal width */
-.columns {
+#display_deal .columns {
     float: left;
     width: 33.3%;
     padding: 8px;
 }
 
 /* Style the list */
-.price {
+#display_deal .price {
     list-style-type: none;
     border: 1px solid #0077B0;
     margin: 0;
@@ -21,37 +21,39 @@
 }
 
 /* Add shadows on hover */
-.price:hover {
+#display_deal .price:hover {
     box-shadow: 0 8px 12px 0 rgba(0,0,0,0.2)
 }
 
 /* Pricing header */
-.price .header {
+#display_deal .price .header {
     background-color: #303030;
     color: white;
     font-size: 25px;
 }
 
-.price .instock {
+#display_deal .price .instock {
     color: #66d9ef;
     text-shadow: 2px 2px rgba(10,10,10,0.2);
 }
 
 /* List items */
-.price li {
+#display_deal .price li {
     border-bottom: 1px solid #005590;
     padding: 2px;
+    width: 100%;
     text-align: center;
 }
 
 /* Grey list item */
-.price .price_value {
+#display_deal .price .price_value {
     background-color: #edfffc;
     font-size: 20px;
+    color: #2923f1;
 }
 
 /* The "Sign Up" button */
-button {
+#display_deal button {
   font-family: "Nunito", sans-serif;
   cursor: pointer;
   display: inline-block;
@@ -65,7 +67,7 @@ button {
   
 }
 
-button:hover, button:active 
+#display_deal button:hover, button:active 
 {
   text-decoration: none;
   color: #60d0e0;
@@ -74,8 +76,8 @@ button:hover, button:active
 }
 /* Change the width of the three columns to 100% 
 (to stack horizontally on small screens) */
-@media only screen and (max-width: 600px) {
+/*@media only screen and (max-width: 600px) {
     .columns {
         width: 100%;
     }
-}
+}*/
