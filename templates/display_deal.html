@@ -1,5 +1,5 @@
 {% load static %}
-<div class="columns">
+<div class="columns" style="width:100%;">
   <ul class="price">
     <li class="header {% if dealresult.inStock == 'In Stock' %}instock{% endif %}">{{dealresult.inStock}}</li>
     <li class="price_value">{{dealresult.Price}}</li>
@@ -9,5 +9,4 @@
 {% endif %}
   </ul>
 </div>
-
-<link rel="stylesheet" type="text/css" href="{% static 'css/price_table.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/price_table.css' %}?v=<?=time();?>" />

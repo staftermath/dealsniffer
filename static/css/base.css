@@ -51,3 +51,7 @@ textarea {
 	border: solid 1px #0077B0; 
 	background: #edfffc;
 }
+
+.hidden {
+    visibility: hidden;
+}
