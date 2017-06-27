@@ -13,6 +13,6 @@
 	opacity: 0.2
 }
 
-.dimple-chart .dimple-axis-group {
-  fill: #227279;
+g.dimple-axis > g.tick > line, g.dimple-axis path.dimple-custom-axis-line {
+  stroke:#227279 !important;
 }
