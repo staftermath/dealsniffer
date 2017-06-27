@@ -1,0 +1,18 @@
+.dimple-chart .dimple-custom-axis-label,.dimple-custom-axis-title {
+	font-family: 'Nunito', sans-serif;
+    fill: #66d9ef;
+}
+
+.dimple-chart .dimple-custom-axis-title {
+	font-family: 'Nunito', sans-serif;
+	font-size: 20px;
+    fill: #44a6ae;
+}
+
+.dimple-chart .dimple-gridline {
+	opacity: 0.2
+}
+
+.dimple-chart .dimple-axis-group {
+  fill: #227279;
+}
