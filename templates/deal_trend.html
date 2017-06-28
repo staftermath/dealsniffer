@@ -8,7 +8,7 @@
 
     var svg = dimple.newSvg("#loadedContainer", 700, 500);
     var parseDate = d3.utcParse("%Y-%m-%dT%H:%M:%S%Z");
-    var axixDate = d3.timeFormat("%H:%M:%S %m/%d")
+    var axixDate = d3.timeFormat("%H:%M %b/%d")
     //console.log("{{data}}")
     var parseddata = JSON.parse("{{data}}".replace(/&quot;/g,'"'))
     // console.log(parseddata)
@@ -20,21 +20,15 @@
   var myChart = new dimple.chart(svg, parseddata);
   myChart.setBounds(60, 50, 600, 300);
   var x = myChart.addCategoryAxis("x", "date");
-  // x.shapes.select("path.dimple-custom-axis-line").style("fill", "#66d9ef");
   x.addOrderRule("Date");
   var y = myChart.addMeasureAxis("y", "price");
-  // y.shapes.select("path.dimple-custom-axis-line").style("fill", "#66d9ef");
   var s = myChart.addSeries(null, dimple.plot.line);
   svg.append("text").attr("x", myChart._xPixels() + myChart._widthPixels() / 2).attr("y", myChart._yPixels() - 20).attr("class", "d3-line").style("text-anchor", "middle").style("font-weight", "bold").text("{{ title }}").style("fill", "#66d9ef");
   myChart.draw();
-  // var container  = document.getElementById('loadedContainer');
-  // var link  = document.createElement('link');
-  // link.rel  = 'stylesheet';
-  // link.type = 'text/css';
-  // link.href = "{% static 'css/trend.css' %}";
-  // link.media = 'all';
-  // container.appendChild(link);
+  x.titleShape.text("DATE");
+  y.titleShape.text("PRICE");
+
 </script>
 </div>
-<link rel="stylesheet" type="text/css" href="{% static 'css/trend.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/dimple.css' %}?v=<?=time();?>" />
 </body>
