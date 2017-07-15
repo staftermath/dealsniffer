@@ -3,5 +3,5 @@
 
 To run webserver:
 ```
-python manager.py runserver
+python manage.py runserver
 ```
